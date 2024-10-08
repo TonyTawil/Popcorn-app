@@ -1,5 +1,14 @@
 import mongoose from "mongoose";
 
+const movieListSchema = new mongoose.Schema(
+  {
+    movieId: { type: Number, required: true },
+    title: { type: String, required: true },
+    coverImage: { type: String, required: true },
+  },
+  { _id: false }
+);
+
 const userSchema = new mongoose.Schema(
   {
     firstName: { type: String, required: true },
@@ -11,6 +20,8 @@ const userSchema = new mongoose.Schema(
     profilePicture: { type: String, default: "" },
     isEmailVerified: { type: Boolean, default: false },
     emailVerificationToken: { type: String, required: false },
+    watchList: [movieListSchema],
+    watched: [movieListSchema],
   },
   { timestamps: true }
 );
