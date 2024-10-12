@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 const replySchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   replyText: { type: String, required: true },
+  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  likesCount: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now },
 });
 
@@ -13,6 +15,7 @@ const reviewSchema = new mongoose.Schema({
   reviewText: { type: String, required: false },
   replies: [replySchema],
   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  likesCount: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now },
 });
 
