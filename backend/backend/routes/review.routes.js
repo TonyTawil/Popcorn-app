@@ -8,6 +8,8 @@ import {
   deleteReplyToReview,
   likeReview,
   likeReply,
+  unlikeReview,
+  unlikeReply,
 } from "../controllers/review.controller.js";
 
 const router = express.Router();
@@ -27,5 +29,9 @@ router.delete("/:reviewId/reply/:replyId", deleteReplyToReview);
 router.post("/:reviewId/like", likeReview);
 
 router.post("/:reviewId/reply/:replyId/like", likeReply);
+
+router.post("/:reviewId/unlike", unlikeReview);
+
+router.post("/:reviewId/reply/:replyId/unlike", unlikeReply);
 
 export default router;

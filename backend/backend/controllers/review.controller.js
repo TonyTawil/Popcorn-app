@@ -278,3 +278,79 @@ export const likeReply = async (req, res) => {
       .json({ message: "Internal server error: " + error.message });
   }
 };
+
+export const unlikeReview = async (req, res) => {
+  try {
+    const { reviewId } = req.params;
+    const { userId } = req.body;
+
+    const review = await Review.findById(reviewId);
+    if (!review) {
+      return res.status(404).json({ message: "Review not found." });
+    }
+
+    const index = review.likes.indexOf(userId);
+    if (index === -1) {
+      return res
+        .status(409)
+        .json({ message: "User has not liked this review." });
+    }
+
+    review.likes.splice(index, 1);
+    review.likesCount = review.likes.length;
+
+    await review.save();
+
+    res.status(200).json({
+      message: "Review unliked successfully.",
+      reviewId: review._id,
+      likesCount: review.likesCount,
+      likes: review.likes,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Internal server error: " + error.message });
+  }
+};
+
+export const unlikeReply = async (req, res) => {
+  try {
+    const { reviewId, replyId } = req.params;
+    const { userId } = req.body;
+
+    const review = await Review.findById(reviewId);
+    if (!review) {
+      return res.status(404).json({ message: "Review not found." });
+    }
+
+    const reply = review.replies.id(replyId);
+    if (!reply) {
+      return res.status(404).json({ message: "Reply not found." });
+    }
+
+    const index = reply.likes.indexOf(userId);
+    if (index === -1) {
+      return res
+        .status(409)
+        .json({ message: "User has not liked this reply." });
+    }
+
+    reply.likes.splice(index, 1);
+    reply.likesCount = reply.likes.length;
+
+    await review.save();
+
+    res.status(200).json({
+      message: "Reply unliked successfully.",
+      reviewId: review._id,
+      replyId: reply._id,
+      likesCount: reply.likesCount,
+      likes: reply.likes,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Internal server error: " + error.message });
+  }
+};
