@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.popcorn.Networking.FetchMoviesTask;
 import com.example.popcorn.R;
+import com.example.popcorn.Utils.NavigationManager;
 import com.google.android.material.navigation.NavigationView;
 
 public class NowPlayingListActivity extends AppCompatActivity {
@@ -21,7 +22,7 @@ public class NowPlayingListActivity extends AppCompatActivity {
     Button btnNext, btnPrevious;
     int currentPage = 1;
     private DrawerLayout drawerLayout;
-    private ActionBarDrawerToggle toggle;
+    private NavigationManager navigationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,41 +31,21 @@ public class NowPlayingListActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.appBarLayout);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);  // Disable default title
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         drawerLayout = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
 
-        toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        navigationManager = new NavigationManager(this, navigationView, drawerLayout);
+        navigationManager.updateDrawerContents();
+
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawerLayout, toolbar,
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
         toggle.getDrawerArrowDrawable().setColor(getResources().getColor(android.R.color.white));
-
-        navigationView.setNavigationItemSelectedListener(item -> {
-            // Handle navigation view item clicks here.
-            int id = item.getItemId();
-
-            if (id == R.id.nav_home) {
-                // Restart the MainActivity
-                Intent intent = new Intent(this, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                drawerLayout.closeDrawer(GravityCompat.START);
-                return true;
-            } else if (id == R.id.nav_contact) {
-                // Handle the contact us action
-            } else if (id == R.id.nav_about) {
-                // Handle the about us action
-            } else if (id == R.id.nav_signup) {
-                // Start the SignUpActivity
-                Intent intent = new Intent(this, SignUpActivity.class);
-                startActivity(intent);
-            }
-
-            drawerLayout.closeDrawer(GravityCompat.START);
-            return true;
-        });
 
         moviesRecyclerView = findViewById(R.id.moviesRecyclerView);
         moviesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -88,6 +69,30 @@ public class NowPlayingListActivity extends AppCompatActivity {
                 loadMovies(currentPage);
                 btnPrevious.setEnabled(currentPage > 1);
             }
+        });
+
+        navigationView.setNavigationItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_logout) {
+                navigationManager.logout();
+                return true;
+            } else if (id == R.id.nav_home) {
+                // Restart the MainActivity
+                Intent intent2 = new Intent(this, MainActivity.class);
+                intent2.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent2);
+                drawerLayout.closeDrawer(GravityCompat.START);
+                return true;
+            } else if (id == R.id.nav_watchlist) {
+                // Handle watchlist navigation
+                return true;
+            } else if (id == R.id.nav_watched) {
+                // Handle watched navigation
+                return true;
+            }
+
+            // If none of the IDs match, you can handle it here or just ignore.
+            return false;
         });
     }
 
