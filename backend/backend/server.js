@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 import authRoutes from "./routes/auth.routes.js";
 import movieRoutes from "./routes/movie.routes.js";
 import reviewRoutes from "./routes/review.routes.js";
+import tmdbRoutes from "./routes/tmdb.routes.js";
+
 import connectToMongo from "./db/connectToMongo.js";
 
 const app = express();
@@ -16,6 +18,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/movies", movieRoutes);
 app.use("/api/reviews", reviewRoutes);
+app.use("/api/tmdb", tmdbRoutes);
 
 app.listen(PORT, () => {
   connectToMongo();
