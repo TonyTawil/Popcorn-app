@@ -1,9 +1,14 @@
 package com.example.popcorn.Networking;
 
-import com.example.popcorn.DTOs.LoginUser;
+import com.example.popcorn.DTOs.CreditsResponse;
 import com.example.popcorn.Models.User;
+import com.example.popcorn.DTOs.LoginUser;
 import com.example.popcorn.DTOs.UserResponse;
 import com.example.popcorn.DTOs.VerificationResponse;
+import com.example.popcorn.DTOs.WatchlistRequest;
+import com.example.popcorn.DTOs.WatchlistResponse;
+import com.example.popcorn.DTOs.WatchlistAddRequest;
+import com.example.popcorn.DTOs.WatchlistAddResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -20,4 +25,13 @@ public interface ApiService {
 
     @GET("api/auth/is-verified/{userId}")
     Call<VerificationResponse> checkEmailVerified(@Path("userId") String userId);
+
+    @POST("api/movies/get-watchlist")
+    Call<WatchlistResponse> fetchWatchlist(@Body WatchlistRequest request);
+
+    @POST("api/movies/add-to-watchlist")
+    Call<WatchlistAddResponse> addToWatchlist(@Body WatchlistAddRequest request);
+
+    @GET("api/tmdb/credits/{movieId}")
+    Call<CreditsResponse> fetchCredits(@Path("movieId") int movieId);
 }

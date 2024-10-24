@@ -3,8 +3,10 @@ package com.example.popcorn.Activities;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,6 +32,7 @@ public class SignInActivity extends AppCompatActivity {
     private Button signInButton;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle toggle;
+    private TextView signUpClickable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,61 +54,77 @@ public class SignInActivity extends AppCompatActivity {
         usernameEditText = findViewById(R.id.usernameEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
         signInButton = findViewById(R.id.signInButton);
+        signUpClickable = findViewById(R.id.signUpClickable);
 
-        signInButton.setOnClickListener(v -> {
-            String username = usernameEditText.getText().toString().trim();
-            String password = passwordEditText.getText().toString().trim();
+        signInButton.setOnClickListener(v -> performLogin());
+        signUpClickable.setOnClickListener(v -> navigateToSignUp());
 
-            ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
-            Call<UserResponse> call = apiService.loginUser(new LoginUser(username, password));
-            call.enqueue(new Callback<UserResponse>() {
-                @Override
-                public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
-                    if (response.isSuccessful() && response.body() != null) {
-                        SharedPreferences prefs = getSharedPreferences("MyPrefs", MODE_PRIVATE);
-                        SharedPreferences.Editor editor = prefs.edit();
-                        editor.putString("userId", response.body().getId());
-                        editor.putString("firstName", response.body().getFirstName());
-                        editor.putString("lastName", response.body().getLastName());
-                        editor.apply();
+        navigationView.setNavigationItemSelectedListener(item -> handleNavigationItemSelected(item));
+    }
 
-                        Intent intent = new Intent(SignInActivity.this, MainActivity.class);
-                        startActivity(intent);
-                        finish();
-                    } else {
-                        try {
-                            Toast.makeText(SignInActivity.this, "Login failed: " + response.errorBody().string(), Toast.LENGTH_LONG).show();
-                        } catch (IOException e) {
-                            Toast.makeText(SignInActivity.this, "Error parsing error response", Toast.LENGTH_LONG).show();
-                        }
-                    }
+    private void performLogin() {
+        String username = usernameEditText.getText().toString().trim();
+        String password = passwordEditText.getText().toString().trim();
+
+        ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
+        Call<UserResponse> call = apiService.loginUser(new LoginUser(username, password));
+        call.enqueue(new Callback<UserResponse>() {
+            @Override
+            public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    saveUserDetailsAndNavigate(response.body());
+                } else {
+                    handleLoginError(response);
                 }
-
-                @Override
-                public void onFailure(Call<UserResponse> call, Throwable t) {
-                    Toast.makeText(SignInActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_LONG).show();
-                }
-            });
-        });
-
-        navigationView.setNavigationItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_signup) {
-                Intent intent = new Intent(this, SignUpActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                drawerLayout.closeDrawer(GravityCompat.START);
-                return true;
-            } else if (id == R.id.nav_home) {
-                Intent intent = new Intent(this, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                drawerLayout.closeDrawer(GravityCompat.START);
-                return true;
             }
 
-            // If none of the IDs match, you can handle it here or just ignore.
-            return false;
+            @Override
+            public void onFailure(Call<UserResponse> call, Throwable t) {
+                Toast.makeText(SignInActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_LONG).show();
+            }
         });
+    }
+
+    private void saveUserDetailsAndNavigate(UserResponse user) {
+        SharedPreferences prefs = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("userId", user.getId());
+        editor.putString("firstName", user.getFirstName());
+        editor.putString("lastName", user.getLastName());
+        editor.apply();
+
+        Intent intent = new Intent(SignInActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    private void handleLoginError(Response<UserResponse> response) {
+        try {
+            Toast.makeText(SignInActivity.this, "Login failed: " + response.errorBody().string(), Toast.LENGTH_LONG).show();
+        } catch (IOException e) {
+            Toast.makeText(SignInActivity.this, "Error parsing error response", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void navigateToSignUp() {
+        Intent intent = new Intent(this, SignUpActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
+
+    private boolean handleNavigationItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.nav_signup) {
+            navigateToSignUp();
+            drawerLayout.closeDrawer(GravityCompat.START);
+            return true;
+        } else if (id == R.id.nav_home) {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            drawerLayout.closeDrawer(GravityCompat.START);
+            return true;
+        }
+        return false;
     }
 }

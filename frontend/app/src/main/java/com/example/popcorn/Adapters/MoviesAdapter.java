@@ -31,6 +31,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
         return new MovieViewHolder(view);
     }
 
+    @Override
     public void onBindViewHolder(MovieViewHolder holder, int position) {
         Movie movie = movieList.get(position);
         holder.titleTextView.setText(movie.getTitle());
@@ -38,6 +39,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
 
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, MovieDetailsActivity.class);
+            intent.putExtra("movieId", movie.getMovieId()); // Ensure you are retrieving the correct movie ID
             intent.putExtra("title", movie.getTitle());
             intent.putExtra("posterPath", movie.getPosterPath());
             intent.putExtra("plot", movie.getPlot());
@@ -46,7 +48,6 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
             context.startActivity(intent);
         });
     }
-
 
     @Override
     public int getItemCount() {

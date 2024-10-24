@@ -53,5 +53,9 @@
             android:name=".Activities.VerificationActivity"
             android:exported="true"/>
 
+        <activity
+            android:name=".Activities.WatchlistActivity"
+            android:exported="true"/>
+
     </application>
 </manifest>

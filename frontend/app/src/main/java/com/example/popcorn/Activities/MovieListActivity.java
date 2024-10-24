@@ -76,13 +76,16 @@ public class MovieListActivity extends AppCompatActivity {
                 return true;
             } else if (id == R.id.nav_home) {
                 // Restart the MainActivity
-                Intent intent2 = new Intent(this, MainActivity.class);
-                intent2.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent2);
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
                 drawerLayout.closeDrawer(GravityCompat.START);
                 return true;
             } else if (id == R.id.nav_watchlist) {
-                // Handle watchlist navigation
+                Intent intent = new Intent(this, WatchlistActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                drawerLayout.closeDrawer(GravityCompat.START);
                 return true;
             } else if (id == R.id.nav_watched) {
                 // Handle watched navigation
