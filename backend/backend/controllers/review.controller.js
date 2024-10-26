@@ -354,3 +354,18 @@ export const unlikeReply = async (req, res) => {
       .json({ message: "Internal server error: " + error.message });
   }
 };
+
+export const getReviewsByMovieId = async (req, res) => {
+  try {
+    const { movieId } = req.params;
+    const reviews = await Review.find({ movieId }).populate(
+      "userId",
+      "username"
+    );
+    res.status(200).json(reviews);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Internal server error: " + error.message });
+  }
+};

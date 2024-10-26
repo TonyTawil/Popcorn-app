@@ -10,6 +10,7 @@ import {
   likeReply,
   unlikeReview,
   unlikeReply,
+  getReviewsByMovieId,
 } from "../controllers/review.controller.js";
 
 const router = express.Router();
@@ -33,5 +34,7 @@ router.post("/:reviewId/reply/:replyId/like", likeReply);
 router.post("/:reviewId/unlike", unlikeReview);
 
 router.post("/:reviewId/reply/:replyId/unlike", unlikeReply);
+
+router.get("/:movieId", getReviewsByMovieId);
 
 export default router;
