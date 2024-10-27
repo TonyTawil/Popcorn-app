@@ -176,7 +176,7 @@ public class FetchMoviesTask extends AsyncTask<Void, Void, List<Movie>> {
     protected void onPostExecute(List<Movie> movies) {
         if (movies != null) {
             // Passing context from the RecyclerView to the adapter
-            recyclerView.setAdapter(new MoviesAdapter(recyclerView.getContext(), movies));
+            recyclerView.setAdapter(new MoviesAdapter(recyclerView.getContext(), movies, false));
         } else {
             Toast.makeText(recyclerView.getContext(), "Failed to fetch movies data", Toast.LENGTH_LONG).show();
         }

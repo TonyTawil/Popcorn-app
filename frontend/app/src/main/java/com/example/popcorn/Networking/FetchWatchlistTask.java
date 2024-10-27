@@ -5,10 +5,13 @@ import android.widget.Toast;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.popcorn.Adapters.MoviesAdapter;
+import com.example.popcorn.DTOs.WatchlistRemoveRequest;
 import com.example.popcorn.DTOs.WatchlistRequest;
 import com.example.popcorn.DTOs.WatchlistResponse;
 import com.example.popcorn.Models.Movie;
 import com.example.popcorn.Models.Person;
+
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -40,7 +43,7 @@ public class FetchWatchlistTask {
                     if (movies.isEmpty()) {
                         Toast.makeText(context, "Watchlist is empty", Toast.LENGTH_LONG).show();
                     } else {
-                        recyclerView.setAdapter(new MoviesAdapter(context, movies));
+                        recyclerView.setAdapter(new MoviesAdapter(context, movies,true));
                     }
                 } else {
                     Toast.makeText(context, "Failed to fetch watchlist", Toast.LENGTH_SHORT).show();
@@ -70,4 +73,27 @@ public class FetchWatchlistTask {
         // Assume you have a method similar to fetchMovies that also retrieves cast and crew for a given movie ID.
         // The implementation depends on your actual API specifications.
     }
+
+    public void removeMovieFromWatchlist(String userId, int movieId, Runnable onSuccess) {
+        ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
+        Call<ResponseBody> call = apiService.removeFromWatchlist(new WatchlistRemoveRequest(userId, movieId));
+
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(context, "Movie removed from watchlist", Toast.LENGTH_SHORT).show();
+                    onSuccess.run(); // Callback to handle UI update
+                } else {
+                    Toast.makeText(context, "Failed to remove movie", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Toast.makeText(context, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 }

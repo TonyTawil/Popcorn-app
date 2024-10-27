@@ -1,5 +1,7 @@
 package com.example.popcorn.Models;
 
+import com.example.popcorn.Models.Person;
+
 import java.util.List;
 
 public class Movie {
@@ -10,20 +12,20 @@ public class Movie {
     private List<Person> cast;
     private List<Person> crew;
 
-    // Modified constructor
+    // Base URL for movie posters
+    private static final String BASE_IMAGE_URL = "https://image.tmdb.org/t/p/w500";
+
     public Movie(int movieId, String title, String posterPath, String plot, List<Person> cast, List<Person> crew) {
         this.movieId = movieId;
         this.title = title;
-        this.posterPath = posterPath;
+        this.setPosterPath(posterPath); // Use setter to format URL
         this.plot = plot;
         this.cast = cast;
         this.crew = crew;
     }
 
-    // Default constructor
     public Movie() {}
 
-    // Setters
     public void setMovieId(int movieId) {
         this.movieId = movieId;
     }
@@ -33,7 +35,11 @@ public class Movie {
     }
 
     public void setPosterPath(String posterPath) {
-        this.posterPath = posterPath;
+        if (posterPath != null && !posterPath.isEmpty()) {
+            this.posterPath = BASE_IMAGE_URL + posterPath;
+        } else {
+            this.posterPath = null; // Handle null or empty paths appropriately
+        }
     }
 
     public void setPlot(String plot) {
@@ -48,7 +54,6 @@ public class Movie {
         this.crew = crew;
     }
 
-    // Getters
     public int getMovieId() {
         return movieId;
     }
