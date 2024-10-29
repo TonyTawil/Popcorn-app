@@ -246,6 +246,7 @@ export const likeReply = async (req, res) => {
 
     const review = await Review.findById(reviewId);
     if (!review) {
+      // Elie Raad
       return res.status(404).json({ message: "Review not found." });
     }
 
