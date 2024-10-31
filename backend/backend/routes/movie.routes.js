@@ -5,6 +5,7 @@ import {
   addToWatched,
   removeFromWatched,
   getWatchlist,
+  getWatched,
 } from "../controllers/movie.controller.js";
 
 const router = express.Router();
@@ -18,5 +19,7 @@ router.post("/add-to-watched", addToWatched);
 router.post("/remove-from-watched", removeFromWatched);
 
 router.post("/get-watchlist", getWatchlist);
+
+router.post("/get-watched", getWatched);
 
 export default router;
