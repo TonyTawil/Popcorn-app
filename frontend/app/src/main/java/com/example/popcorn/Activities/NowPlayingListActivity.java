@@ -73,30 +73,27 @@ public class NowPlayingListActivity extends AppCompatActivity {
 
         navigationView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
-            if (id == R.id.nav_logout) {
-                navigationManager.logout();
-                return true;
-            } else if (id == R.id.nav_home) {
-                // Restart the MainActivity
-                Intent intent = new Intent(this, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
+            if (id == R.id.nav_home) {
+                startActivity(new Intent(this, MainActivity.class));
                 drawerLayout.closeDrawer(GravityCompat.START);
                 return true;
             } else if (id == R.id.nav_watchlist) {
-                Intent intent = new Intent(this, WatchlistActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                finish();
+                startActivity(getIntent());
+                drawerLayout.closeDrawer(GravityCompat.START);
+                return true;
+            } else if (id == R.id.nav_watched) {  // Check if the 'Watched' menu item is clicked
+                Intent intent = new Intent(this, WatchedActivity.class);
                 startActivity(intent);
                 drawerLayout.closeDrawer(GravityCompat.START);
                 return true;
-            } else if (id == R.id.nav_watched) {
-                // Handle watched navigation
+            } else if (id == R.id.nav_logout) {
+                navigationManager.logout();
                 return true;
             }
-
-            // If none of the IDs match, you can handle it here or just ignore.
             return false;
         });
+
     }
 
     private void loadMovies(int page) {

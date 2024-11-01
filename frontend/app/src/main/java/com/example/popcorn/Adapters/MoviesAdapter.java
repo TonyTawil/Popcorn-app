@@ -12,6 +12,7 @@ import com.bumptech.glide.Glide;
 import com.example.popcorn.Activities.MovieDetailsActivity;
 import com.example.popcorn.Models.Movie;
 import com.example.popcorn.Networking.FetchWatchlistTask;
+import com.example.popcorn.Networking.FetchWatchedTask;
 import com.example.popcorn.R;
 
 import java.util.List;
@@ -20,13 +21,17 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
     private Context context;
     private List<Movie> movieList;
     private boolean showDeleteIcon;
-    private FetchWatchlistTask fetchWatchlistTask; // Add this to handle the deletion
+    private String listType; // "watchlist" or "watched"
+    private FetchWatchlistTask fetchWatchlistTask;
+    private FetchWatchedTask fetchWatchedTask;
 
-    public MoviesAdapter(Context context, List<Movie> movieList, boolean showDeleteIcon) {
+    public MoviesAdapter(Context context, List<Movie> movieList, boolean showDeleteIcon, String listType) {
         this.context = context;
         this.movieList = movieList;
         this.showDeleteIcon = showDeleteIcon;
-        this.fetchWatchlistTask = new FetchWatchlistTask(null, "", context); // Initialize with null since RecyclerView isn't used directly here
+        this.listType = listType;
+        this.fetchWatchlistTask = new FetchWatchlistTask(null, "", context);
+        this.fetchWatchedTask = new FetchWatchedTask(null, "", context);
     }
 
     @Override
@@ -54,11 +59,19 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
             holder.removeIcon.setOnClickListener(v -> {
                 String userId = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE).getString("userId", null);
                 if (userId != null) {
-                    fetchWatchlistTask.removeMovieFromWatchlist(userId, movie.getMovieId(), () -> {
-                        movieList.remove(position);
-                        notifyItemRemoved(position);
-                        notifyItemRangeChanged(position, movieList.size());
-                    });
+                    if ("watchlist".equals(listType)) {
+                        fetchWatchlistTask.removeMovieFromWatchlist(userId, movie.getMovieId(), () -> {
+                            movieList.remove(position);
+                            notifyItemRemoved(position);
+                            notifyItemRangeChanged(position, movieList.size());
+                        });
+                    } else if ("watched".equals(listType)) {
+                        fetchWatchedTask.removeMovieFromWatched(userId, movie.getMovieId(), () -> {
+                            movieList.remove(position);
+                            notifyItemRemoved(position);
+                            notifyItemRangeChanged(position, movieList.size());
+                        });
+                    }
                 }
             });
         } else {
@@ -74,7 +87,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
     public static class MovieViewHolder extends RecyclerView.ViewHolder {
         TextView titleTextView;
         ImageView posterImageView;
-        ImageView removeIcon; // Icon for removing a movie from the watchlist
+        ImageView removeIcon; // Icon for removing a movie from the lists
 
         public MovieViewHolder(View itemView) {
             super(itemView);

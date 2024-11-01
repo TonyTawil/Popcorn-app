@@ -1,8 +1,9 @@
 package com.example.popcorn.Activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.widget.Button;
+import android.widget.Toast;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -11,23 +12,22 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.popcorn.Networking.FetchMoviesTask;
+import com.example.popcorn.Networking.FetchWatchedTask;
 import com.example.popcorn.R;
 import com.example.popcorn.Utils.NavigationManager;
 import com.google.android.material.navigation.NavigationView;
 
-public class MovieListActivity extends AppCompatActivity {
-
-    RecyclerView moviesRecyclerView;
-    Button btnNext, btnPrevious;
-    int currentPage = 1;
+public class WatchedActivity extends AppCompatActivity {
+    private RecyclerView watchedRecyclerView;
     private DrawerLayout drawerLayout;
+    private ActionBarDrawerToggle toggle;
+    private SharedPreferences sharedPreferences;
     private NavigationManager navigationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_movie_list);
+        setContentView(R.layout.activity_watched);
 
         Toolbar toolbar = findViewById(R.id.appBarLayout);
         setSupportActionBar(toolbar);
@@ -38,36 +38,25 @@ public class MovieListActivity extends AppCompatActivity {
         navigationManager = new NavigationManager(this, navigationView, drawerLayout);
         navigationManager.updateDrawerContents();
 
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawerLayout, toolbar,
+        toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
         toggle.getDrawerArrowDrawable().setColor(getResources().getColor(android.R.color.white));
 
-        moviesRecyclerView = findViewById(R.id.moviesRecyclerView);
-        moviesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        String userId = sharedPreferences.getString("userId", null);
 
-        btnNext = findViewById(R.id.btnNext);
-        btnPrevious = findViewById(R.id.btnPrevious);
+        watchedRecyclerView = findViewById(R.id.watchedMoviesRecyclerView);
+        watchedRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        loadMovies(currentPage, "trending");
-        updateButtons();
-
-        btnNext.setOnClickListener(v -> {
-            currentPage++;
-            loadMovies(currentPage, "trending");
-            updateButtons();
-        });
-
-        btnPrevious.setOnClickListener(v -> {
-            if (currentPage > 1) {
-                currentPage--;
-                loadMovies(currentPage, "trending");
-                updateButtons();
-            }
-        });
+        if (userId != null) {
+            FetchWatchedTask fetchWatchedTask = new FetchWatchedTask(watchedRecyclerView, userId, this);
+            fetchWatchedTask.fetchWatched();
+        } else {
+            Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show();
+        }
 
         navigationView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
@@ -75,13 +64,13 @@ public class MovieListActivity extends AppCompatActivity {
                 startActivity(new Intent(this, MainActivity.class));
                 drawerLayout.closeDrawer(GravityCompat.START);
                 return true;
-            } else if (id == R.id.nav_watchlist) {
+            } else if (id == R.id.nav_watched) {
                 finish();
                 startActivity(getIntent());
                 drawerLayout.closeDrawer(GravityCompat.START);
                 return true;
-            } else if (id == R.id.nav_watched) {  // Check if the 'Watched' menu item is clicked
-                Intent intent = new Intent(this, WatchedActivity.class);
+            } else if (id == R.id.nav_watchlist) {  // Check if the 'Watched' menu item is clicked
+                Intent intent = new Intent(this, WatchlistActivity.class);
                 startActivity(intent);
                 drawerLayout.closeDrawer(GravityCompat.START);
                 return true;
@@ -91,14 +80,5 @@ public class MovieListActivity extends AppCompatActivity {
             }
             return false;
         });
-
-    }
-
-    private void loadMovies(int page, String category) {
-        new FetchMoviesTask(moviesRecyclerView, page, 10, category).execute();
-    }
-
-    private void updateButtons() {
-        btnPrevious.setEnabled(currentPage > 1);
     }
 }

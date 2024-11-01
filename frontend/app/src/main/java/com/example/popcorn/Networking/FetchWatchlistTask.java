@@ -43,7 +43,7 @@ public class FetchWatchlistTask {
                     if (movies.isEmpty()) {
                         Toast.makeText(context, "Watchlist is empty", Toast.LENGTH_LONG).show();
                     } else {
-                        recyclerView.setAdapter(new MoviesAdapter(context, movies,true));
+                        recyclerView.setAdapter(new MoviesAdapter(context, movies,true,"watchlist"));
                     }
                 } else {
                     Toast.makeText(context, "Failed to fetch watchlist", Toast.LENGTH_SHORT).show();

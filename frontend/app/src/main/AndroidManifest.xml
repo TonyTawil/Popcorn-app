@@ -57,5 +57,9 @@
             android:name=".Activities.WatchlistActivity"
             android:exported="true"/>
 
+        <activity
+            android:name=".Activities.WatchedActivity"
+            android:exported="true"/>
+
     </application>
 </manifest>

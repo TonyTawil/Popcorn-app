@@ -17,6 +17,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.popcorn.Adapters.PeopleAdapter;
+import com.example.popcorn.DTOs.WatchedAddRequest;
+import com.example.popcorn.DTOs.WatchedAddResponse;
 import com.example.popcorn.Models.Person;
 import com.example.popcorn.Networking.ApiService;
 import com.example.popcorn.Networking.RetrofitClient;
@@ -35,7 +37,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
     private RecyclerView castRecyclerView, crewRecyclerView;
     private DrawerLayout drawerLayout;
     private NavigationManager navigationManager;
-    private Button addToWatchlistButton;
+    private Button addToWatchlistButton, markAsWatchedButton, addReviewButton;
     private SharedPreferences sharedPreferences;
     private int movieId; // Variable to store movie ID
 
@@ -51,7 +53,6 @@ public class MovieDetailsActivity extends AppCompatActivity {
         drawerLayout = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationManager = new NavigationManager(this, navigationView, drawerLayout);
-        navigationManager.updateDrawerContents();
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawerLayout, toolbar,
@@ -61,11 +62,12 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
         toggle.getDrawerArrowDrawable().setColor(getResources().getColor(android.R.color.white));
 
+
         sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         movieId = getIntent().getIntExtra("movieId", -1); // Fetch the movie ID from intent
         if (movieId == -1) {
             Toast.makeText(this, "Invalid movie details", Toast.LENGTH_LONG).show();
-            finish(); // Finish activity if no valid ID is found
+            finish();
             return;
         }
 
@@ -79,32 +81,32 @@ public class MovieDetailsActivity extends AppCompatActivity {
         initRecyclerViews();
 
         addToWatchlistButton = findViewById(R.id.addToWatchlistButton);
+        markAsWatchedButton = findViewById(R.id.markAsWatchedButton);
+        addReviewButton = findViewById(R.id.addReviewButton);
+
         addToWatchlistButton.setOnClickListener(v -> addToWatchlist());
+        markAsWatchedButton.setOnClickListener(v -> addToWatched());
 
         navigationView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
-            if (id == R.id.nav_logout) {
-                navigationManager.logout();
-                return true;
-            } else if (id == R.id.nav_home) {
-                // Restart the MainActivity
-                Intent intent = new Intent(this, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
+            if (id == R.id.nav_home) {
+                startActivity(new Intent(this, MainActivity.class));
                 drawerLayout.closeDrawer(GravityCompat.START);
                 return true;
             } else if (id == R.id.nav_watchlist) {
-                Intent intent = new Intent(this, WatchlistActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                finish();
+                startActivity(getIntent());
+                drawerLayout.closeDrawer(GravityCompat.START);
+                return true;
+            } else if (id == R.id.nav_watched) {  // Check if the 'Watched' menu item is clicked
+                Intent intent = new Intent(this, WatchedActivity.class);
                 startActivity(intent);
                 drawerLayout.closeDrawer(GravityCompat.START);
                 return true;
-            } else if (id == R.id.nav_watched) {
-                // Handle watched navigation
+            } else if (id == R.id.nav_logout) {
+                navigationManager.logout();
                 return true;
             }
-
-            // If none of the IDs match, you can handle it here or just ignore.
             return false;
         });
     }
@@ -128,7 +130,6 @@ public class MovieDetailsActivity extends AppCompatActivity {
         castRecyclerView.setAdapter(new PeopleAdapter(this, cast));
         crewRecyclerView.setAdapter(new PeopleAdapter(this, crew));
     }
-
     private void addToWatchlist() {
         String userId = sharedPreferences.getString("userId", null);
         if (userId == null) {
@@ -158,4 +159,36 @@ public class MovieDetailsActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void addToWatched() {
+        String userId = sharedPreferences.getString("userId", null);
+        if (userId == null) {
+            Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Fetching movie details from the intent
+        String title = getIntent().getStringExtra("title");
+        String posterPath = getIntent().getStringExtra("posterPath");
+
+        ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
+        WatchedAddRequest request = new WatchedAddRequest(userId, movieId, title, posterPath);
+
+        apiService.addToWatched(request).enqueue(new Callback<WatchedAddResponse>() {
+            @Override
+            public void onResponse(Call<WatchedAddResponse> call, Response<WatchedAddResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Toast.makeText(MovieDetailsActivity.this, "Added to watched list", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(MovieDetailsActivity.this, "Failed to add to watched list: " + response.code(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<WatchedAddResponse> call, Throwable t) {
+                Toast.makeText(MovieDetailsActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 }
