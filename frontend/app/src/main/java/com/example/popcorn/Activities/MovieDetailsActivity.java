@@ -19,11 +19,11 @@ import com.bumptech.glide.Glide;
 import com.example.popcorn.Adapters.PeopleAdapter;
 import com.example.popcorn.DTOs.WatchedAddRequest;
 import com.example.popcorn.DTOs.WatchedAddResponse;
+import com.example.popcorn.DTOs.WatchlistAddRequest;
+import com.example.popcorn.DTOs.WatchlistAddResponse;
 import com.example.popcorn.Models.Person;
 import com.example.popcorn.Networking.ApiService;
 import com.example.popcorn.Networking.RetrofitClient;
-import com.example.popcorn.DTOs.WatchlistAddRequest;
-import com.example.popcorn.DTOs.WatchlistAddResponse;
 import com.example.popcorn.R;
 import com.example.popcorn.Utils.NavigationManager;
 import com.google.android.material.navigation.NavigationView;
@@ -39,12 +39,20 @@ public class MovieDetailsActivity extends AppCompatActivity {
     private NavigationManager navigationManager;
     private Button addToWatchlistButton, markAsWatchedButton, addReviewButton;
     private SharedPreferences sharedPreferences;
-    private int movieId; // Variable to store movie ID
+    private int movieId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_details);
+
+        sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        movieId = getIntent().getIntExtra("movieId", -1);  // Ensure the movie ID is retrieved correctly
+        if (movieId == -1) {
+            Toast.makeText(this, "Invalid movie details", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
 
         Toolbar toolbar = findViewById(R.id.appBarLayout);
         setSupportActionBar(toolbar);
@@ -53,23 +61,13 @@ public class MovieDetailsActivity extends AppCompatActivity {
         drawerLayout = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationManager = new NavigationManager(this, navigationView, drawerLayout);
+        navigationManager.updateDrawerContents(); // Ensuring the drawer is updated when activity is created
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawerLayout, toolbar,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
-
-        toggle.getDrawerArrowDrawable().setColor(getResources().getColor(android.R.color.white));
-
-
-        sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
-        movieId = getIntent().getIntExtra("movieId", -1); // Fetch the movie ID from intent
-        if (movieId == -1) {
-            Toast.makeText(this, "Invalid movie details", Toast.LENGTH_LONG).show();
-            finish();
-            return;
-        }
 
         ImageView moviePosterImageView = findViewById(R.id.moviePosterImageView);
         TextView movieTitleTextView = findViewById(R.id.movieTitleTextView);
@@ -86,6 +84,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
         addToWatchlistButton.setOnClickListener(v -> addToWatchlist());
         markAsWatchedButton.setOnClickListener(v -> addToWatched());
+        addReviewButton.setOnClickListener(v -> openAddReviewActivity());
 
         navigationView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
@@ -98,7 +97,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
                 startActivity(getIntent());
                 drawerLayout.closeDrawer(GravityCompat.START);
                 return true;
-            } else if (id == R.id.nav_watched) {  // Check if the 'Watched' menu item is clicked
+            } else if (id == R.id.nav_watched) {
                 Intent intent = new Intent(this, WatchedActivity.class);
                 startActivity(intent);
                 drawerLayout.closeDrawer(GravityCompat.START);
@@ -116,7 +115,6 @@ public class MovieDetailsActivity extends AppCompatActivity {
         String title = intent.getStringExtra("title");
         String posterPath = intent.getStringExtra("posterPath");
         String plot = intent.getStringExtra("plot");
-
         movieTitleTextView.setText(title);
         moviePlotTextView.setText(plot);
         Glide.with(this).load(posterPath).into(moviePosterImageView);
@@ -130,17 +128,27 @@ public class MovieDetailsActivity extends AppCompatActivity {
         castRecyclerView.setAdapter(new PeopleAdapter(this, cast));
         crewRecyclerView.setAdapter(new PeopleAdapter(this, crew));
     }
+
+    private void openAddReviewActivity() {
+        String userId = sharedPreferences.getString("userId", null);
+        if (userId == null) {
+            Toast.makeText(this, "You must be logged in to add a review.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Intent intent = new Intent(this, AddReviewActivity.class);
+        intent.putExtra("movieId", movieId); // Ensure the movie ID is passed correctly
+        startActivity(intent);
+    }
+
     private void addToWatchlist() {
         String userId = sharedPreferences.getString("userId", null);
         if (userId == null) {
             Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show();
             return;
         }
-
         ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
         WatchlistAddRequest request = new WatchlistAddRequest(
                 userId, movieId, getIntent().getStringExtra("title"), getIntent().getStringExtra("posterPath"));
-
         apiService.addToWatchlist(request).enqueue(new Callback<WatchlistAddResponse>() {
             @Override
             public void onResponse(Call<WatchlistAddResponse> call, Response<WatchlistAddResponse> response) {
@@ -166,14 +174,10 @@ public class MovieDetailsActivity extends AppCompatActivity {
             Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        // Fetching movie details from the intent
         String title = getIntent().getStringExtra("title");
         String posterPath = getIntent().getStringExtra("posterPath");
-
         ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
         WatchedAddRequest request = new WatchedAddRequest(userId, movieId, title, posterPath);
-
         apiService.addToWatched(request).enqueue(new Callback<WatchedAddResponse>() {
             @Override
             public void onResponse(Call<WatchedAddResponse> call, Response<WatchedAddResponse> response) {
@@ -191,4 +195,9 @@ public class MovieDetailsActivity extends AppCompatActivity {
         });
     }
 
+    private void saveMovieIdToPreferences(int movieId) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("movieId", movieId);
+        editor.apply(); // Asynchronous save without pausing UI thread
+    }
 }

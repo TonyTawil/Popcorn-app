@@ -80,8 +80,8 @@ public class UpcomingListActivity extends AppCompatActivity {
                 drawerLayout.closeDrawer(GravityCompat.START);
                 return true;
             } else if (id == R.id.nav_watchlist) {
-                finish();
-                startActivity(getIntent());
+                Intent intent = new Intent(this, WatchlistActivity.class);
+                startActivity(intent);
                 drawerLayout.closeDrawer(GravityCompat.START);
                 return true;
             } else if (id == R.id.nav_watched) {  // Check if the 'Watched' menu item is clicked

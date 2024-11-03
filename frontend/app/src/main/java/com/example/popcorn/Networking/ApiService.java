@@ -3,6 +3,8 @@ package com.example.popcorn.Networking;
 import com.example.popcorn.DTOs.CreditsResponse;
 import com.example.popcorn.DTOs.LoginUser;
 import com.example.popcorn.DTOs.MoviesResponse;
+import com.example.popcorn.DTOs.ReviewRequest;
+import com.example.popcorn.DTOs.ReviewResponse;
 import com.example.popcorn.DTOs.UserResponse;
 import com.example.popcorn.DTOs.VerificationResponse;
 import com.example.popcorn.DTOs.WatchlistAddRequest;
@@ -74,4 +76,8 @@ public interface ApiService {
 
     @GET("api/tmdb/similar/{movieId}")
     Call<List<Movie>> getSimilarMovies(@Path("movieId") int movieId);
+
+    @POST("api/reviews/add-review")
+    Call<ReviewResponse> addReview(@Body ReviewRequest reviewRequest);
+
 }
