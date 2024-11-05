@@ -4,7 +4,7 @@ export const addReview = async (req, res) => {
   try {
     const { movieId, userId, rating, reviewText } = req.body;
 
-    const existingRating = await Review.findOne({ movieId, userId, rating });
+    const existingRating = await Review.findOne({ movieId, userId});
     if (existingRating) {
       return res
         .status(409)
