@@ -2,12 +2,14 @@ package com.example.popcorn.Adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.bumptech.glide.Glide;
 import com.example.popcorn.Activities.MovieDetailsActivity;
 import com.example.popcorn.Models.Movie;
@@ -47,6 +49,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
         Glide.with(context).load(movie.getPosterPath()).into(holder.posterImageView);
 
         holder.itemView.setOnClickListener(v -> {
+            updateSharedPreferences(movie.getMovieId());
             Intent intent = new Intent(context, MovieDetailsActivity.class);
             intent.putExtra("movieId", movie.getMovieId());
             intent.putExtra("title", movie.getTitle());
@@ -77,6 +80,13 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
         } else {
             holder.removeIcon.setVisibility(View.GONE);
         }
+    }
+
+    private void updateSharedPreferences(int movieId) {
+        SharedPreferences prefs = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putInt("movieId", movieId);
+        editor.apply();
     }
 
     @Override

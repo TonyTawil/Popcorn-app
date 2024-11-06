@@ -65,5 +65,9 @@
             android:name=".Activities.AddReviewActivity"
             android:exported="true"/>
 
+        <activity
+            android:name=".Activities.ReviewsActivity"
+            android:exported="true"/>
+
     </application>
 </manifest>

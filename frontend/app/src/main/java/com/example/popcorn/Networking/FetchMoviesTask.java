@@ -105,7 +105,7 @@ public class FetchMoviesTask extends AsyncTask<Void, Void, List<Movie>> {
                 List<Person> cast = fetchCredits(movieId, "cast");
                 List<Person> crew = fetchCredits(movieId, "crew");
 
-                results.add(new Movie(movieId,title, posterPath, plot, cast, crew));
+                results.add(new Movie(movieId, title, posterPath, plot, cast, crew));
             }
         } catch (Exception e) {
             Log.e(TAG, "Error parsing JSON", e);

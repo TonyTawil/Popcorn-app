@@ -37,7 +37,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
     private RecyclerView castRecyclerView, crewRecyclerView;
     private DrawerLayout drawerLayout;
     private NavigationManager navigationManager;
-    private Button addToWatchlistButton, markAsWatchedButton, addReviewButton;
+    private Button addToWatchlistButton, markAsWatchedButton, addReviewButton, viewReviewsButton;
     private SharedPreferences sharedPreferences;
     private int movieId;
 
@@ -47,7 +47,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_movie_details);
 
         sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
-        movieId = getIntent().getIntExtra("movieId", -1);  // Ensure the movie ID is retrieved correctly
+        movieId = getIntent().getIntExtra("movieId", -1);
         if (movieId == -1) {
             Toast.makeText(this, "Invalid movie details", Toast.LENGTH_LONG).show();
             finish();
@@ -61,13 +61,8 @@ public class MovieDetailsActivity extends AppCompatActivity {
         drawerLayout = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationManager = new NavigationManager(this, navigationView, drawerLayout);
-        navigationManager.updateDrawerContents(); // Ensuring the drawer is updated when activity is created
-
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawerLayout, toolbar,
-                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawerLayout.addDrawerListener(toggle);
-        toggle.syncState();
+        navigationManager.updateDrawerContents();
+        setupDrawer(toolbar);
 
         ImageView moviePosterImageView = findViewById(R.id.moviePosterImageView);
         TextView movieTitleTextView = findViewById(R.id.movieTitleTextView);
@@ -81,33 +76,24 @@ public class MovieDetailsActivity extends AppCompatActivity {
         addToWatchlistButton = findViewById(R.id.addToWatchlistButton);
         markAsWatchedButton = findViewById(R.id.markAsWatchedButton);
         addReviewButton = findViewById(R.id.addReviewButton);
+        viewReviewsButton = findViewById(R.id.viewAllReviewsButton);
 
         addToWatchlistButton.setOnClickListener(v -> addToWatchlist());
         markAsWatchedButton.setOnClickListener(v -> addToWatched());
         addReviewButton.setOnClickListener(v -> openAddReviewActivity());
+        viewReviewsButton.setOnClickListener(v -> openReviewsActivity());
 
-        navigationView.setNavigationItemSelectedListener(item -> {
-            int id = item.getItemId();
-            if (id == R.id.nav_home) {
-                startActivity(new Intent(this, MainActivity.class));
-                drawerLayout.closeDrawer(GravityCompat.START);
-                return true;
-            } else if (id == R.id.nav_watchlist) {
-                finish();
-                startActivity(getIntent());
-                drawerLayout.closeDrawer(GravityCompat.START);
-                return true;
-            } else if (id == R.id.nav_watched) {
-                Intent intent = new Intent(this, WatchedActivity.class);
-                startActivity(intent);
-                drawerLayout.closeDrawer(GravityCompat.START);
-                return true;
-            } else if (id == R.id.nav_logout) {
-                navigationManager.logout();
-                return true;
-            }
-            return false;
-        });
+        setupNavigationMenu(navigationView);
+    }
+
+    private void setupDrawer(Toolbar toolbar) {
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawerLayout, toolbar,
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+
+        toggle.getDrawerArrowDrawable().setColor(getResources().getColor(android.R.color.white));
     }
 
     private void displayMovieDetails(ImageView moviePosterImageView, TextView movieTitleTextView, TextView moviePlotTextView) {
@@ -115,6 +101,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         String title = intent.getStringExtra("title");
         String posterPath = intent.getStringExtra("posterPath");
         String plot = intent.getStringExtra("plot");
+
         movieTitleTextView.setText(title);
         moviePlotTextView.setText(plot);
         Glide.with(this).load(posterPath).into(moviePosterImageView);
@@ -136,8 +123,39 @@ public class MovieDetailsActivity extends AppCompatActivity {
             return;
         }
         Intent intent = new Intent(this, AddReviewActivity.class);
-        intent.putExtra("movieId", movieId); // Ensure the movie ID is passed correctly
+        intent.putExtra("movieId", movieId);
         startActivity(intent);
+    }
+
+    private void openReviewsActivity() {
+        Intent intent = new Intent(this, ReviewsActivity.class);
+        intent.putExtra("movieId", movieId);
+        startActivity(intent);
+    }
+
+    private void setupNavigationMenu(NavigationView navigationView) {
+        navigationView.setNavigationItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_home) {
+                startActivity(new Intent(this, MainActivity.class));
+                drawerLayout.closeDrawer(GravityCompat.START);
+                return true;
+            } else if (id == R.id.nav_watchlist) {
+                Intent intent = new Intent(this, WatchlistActivity.class);
+                startActivity(intent);
+                drawerLayout.closeDrawer(GravityCompat.START);
+                return true;
+            } else if (id == R.id.nav_watched) {
+                Intent intent = new Intent(this, WatchedActivity.class);
+                startActivity(intent);
+                drawerLayout.closeDrawer(GravityCompat.START);
+                return true;
+            } else if (id == R.id.nav_logout) {
+                navigationManager.logout();
+                return true;
+            }
+            return false;
+        });
     }
 
     private void addToWatchlist() {
@@ -193,11 +211,5 @@ public class MovieDetailsActivity extends AppCompatActivity {
                 Toast.makeText(MovieDetailsActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    private void saveMovieIdToPreferences(int movieId) {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt("movieId", movieId);
-        editor.apply(); // Asynchronous save without pausing UI thread
     }
 }

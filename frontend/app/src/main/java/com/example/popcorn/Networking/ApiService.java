@@ -18,6 +18,7 @@ import com.example.popcorn.DTOs.WatchedRemoveRequest;
 import com.example.popcorn.DTOs.WatchedRequest;
 import com.example.popcorn.DTOs.WatchedResponse;
 import com.example.popcorn.Models.Movie;
+import com.example.popcorn.Models.Review;
 import com.example.popcorn.Models.User;
 
 import java.util.List;
@@ -80,4 +81,6 @@ public interface ApiService {
     @POST("api/reviews/add-review")
     Call<ReviewResponse> addReview(@Body ReviewRequest reviewRequest);
 
+    @GET("api/reviews/{movieId}")
+    Call<List<Review>> getReviewsByMovieId(@Path("movieId") int movieId);
 }
