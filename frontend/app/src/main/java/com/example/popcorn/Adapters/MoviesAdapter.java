@@ -17,6 +17,7 @@ import com.example.popcorn.Networking.FetchWatchlistTask;
 import com.example.popcorn.Networking.FetchWatchedTask;
 import com.example.popcorn.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewHolder> {
@@ -54,6 +55,9 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
             intent.putExtra("movieId", movie.getMovieId());
             intent.putExtra("title", movie.getTitle());
             intent.putExtra("posterPath", movie.getPosterPath());
+            intent.putExtra("plot", movie.getPlot());
+            intent.putParcelableArrayListExtra("cast", new ArrayList<>(movie.getCast()));
+            intent.putParcelableArrayListExtra("crew", new ArrayList<>(movie.getCrew()));
             context.startActivity(intent);
         });
 

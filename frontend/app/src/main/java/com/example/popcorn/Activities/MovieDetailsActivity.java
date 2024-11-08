@@ -28,7 +28,8 @@ import com.example.popcorn.R;
 import com.example.popcorn.Utils.NavigationManager;
 import com.google.android.material.navigation.NavigationView;
 
-import java.util.List;
+import java.util.ArrayList;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -108,8 +109,8 @@ public class MovieDetailsActivity extends AppCompatActivity {
     }
 
     private void initRecyclerViews() {
-        List<Person> cast = getIntent().getParcelableArrayListExtra("cast");
-        List<Person> crew = getIntent().getParcelableArrayListExtra("crew");
+        ArrayList<Person> cast = getIntent().getParcelableArrayListExtra("cast");
+        ArrayList<Person> crew = getIntent().getParcelableArrayListExtra("crew");
         castRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         crewRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         castRecyclerView.setAdapter(new PeopleAdapter(this, cast));
@@ -212,4 +213,6 @@ public class MovieDetailsActivity extends AppCompatActivity {
             }
         });
     }
+
+    // Add your methods for addToWatchlist and addToWatched here, ensuring they handle the SharedPreferences correctly
 }

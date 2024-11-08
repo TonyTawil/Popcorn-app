@@ -107,12 +107,12 @@ public class FetchMoviesTask extends AsyncTask<Void, Void, List<Movie>> {
 
                 results.add(new Movie(movieId, title, posterPath, plot, cast, crew));
             }
-        } catch (Exception e) {
+        } catch (JSONException e) {
             Log.e(TAG, "Error parsing JSON", e);
         }
-
         return results;
     }
+
 
     private List<Person> fetchCredits(int movieId, String type) {
         List<Person> people = new ArrayList<>();
