@@ -3,6 +3,7 @@ package com.example.popcorn.Activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.Toast;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -75,6 +76,10 @@ public class ReviewsActivity extends AppCompatActivity {
         reviewsRecyclerView = findViewById(R.id.reviewsRecyclerView);
         reviewsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         loadReviews();
+
+        navigationManager.updateDrawerContents();
+        navigationView.setNavigationItemSelectedListener(this::onNavigationItemSelected);
+
     }
 
     private void loadReviews() {
@@ -88,7 +93,7 @@ public class ReviewsActivity extends AppCompatActivity {
                     if (reviews.isEmpty()) {
                         Toast.makeText(ReviewsActivity.this, "No reviews available.", Toast.LENGTH_SHORT).show();
                     } else {
-                        reviewsAdapter = new ReviewsAdapter(reviews);
+                        reviewsAdapter = new ReviewsAdapter(reviews, ReviewsActivity.this);
                         reviewsRecyclerView.setAdapter(reviewsAdapter);
                     }
                 } else {
@@ -106,6 +111,21 @@ public class ReviewsActivity extends AppCompatActivity {
     }
 
 
+    private boolean onNavigationItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.nav_home) {
+            startActivity(new Intent(this, MainActivity.class));
+        } else if (id == R.id.nav_watchlist) {
+            startActivity(new Intent(this, WatchlistActivity.class));
+        } else if (id == R.id.nav_watched) {
+            startActivity(new Intent(this, WatchedActivity.class));
+        } else if (id == R.id.nav_logout) {
+            navigationManager.logout();
+            finish();
+        }
+        drawerLayout.closeDrawer(GravityCompat.START);
+        return true;
+    }
 
     private String parseUserId(JsonObject jsonObject) {
         try {

@@ -117,12 +117,10 @@ public class AddReviewActivity extends AppCompatActivity {
             public void onResponse(Call<ReviewResponse> call, Response<ReviewResponse> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(AddReviewActivity.this, "Review submitted!", Toast.LENGTH_SHORT).show();
-                    // Navigate back to MovieDetailsActivity
-                    Intent intent = new Intent(AddReviewActivity.this, MovieDetailsActivity.class);
-                    intent.putExtra("movieId", movieId);
-                    intent.putExtra("title", getIntent().getStringExtra("title")); // Pass title back
-                    intent.putExtra("posterPath", getIntent().getStringExtra("posterPath")); // Pass poster path back
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                    // Redirect to ReviewsActivity to see all reviews for the movie
+                    Intent intent = new Intent(AddReviewActivity.this, ReviewsActivity.class);
+                    intent.putExtra("movieId", movieId); // Ensure ReviewsActivity is expecting this extra
                     startActivity(intent);
                     finish();
 
@@ -146,6 +144,7 @@ public class AddReviewActivity extends AppCompatActivity {
             }
         });
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

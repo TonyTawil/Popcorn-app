@@ -20,13 +20,16 @@ import com.example.popcorn.DTOs.WatchedResponse;
 import com.example.popcorn.Models.Movie;
 import com.example.popcorn.Models.Review;
 import com.example.popcorn.Models.User;
+import com.google.gson.JsonObject;
 
 import java.util.List;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.HTTP;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
@@ -62,25 +65,13 @@ public interface ApiService {
     @POST("api/movies/remove-from-watched")
     Call<ResponseBody> removeFromWatched(@Body WatchedRemoveRequest request);
 
-    // TMDB API endpoints
-    @GET("api/tmdb/movie/trending")
-    Call<MoviesResponse> getTrendingMovies(@Query("page") int page);
-
-    @GET("api/tmdb/movie/now_playing")
-    Call<MoviesResponse> getNowPlayingMovies(@Query("page") int page);
-
-    @GET("api/tmdb/movie/upcoming")
-    Call<MoviesResponse> getUpcomingMovies(@Query("page") int page);
-
-    @GET("api/tmdb/credits/{movieId}")
-    Call<CreditsResponse> fetchCredits(@Path("movieId") int movieId);
-
-    @GET("api/tmdb/similar/{movieId}")
-    Call<List<Movie>> getSimilarMovies(@Path("movieId") int movieId);
-
     @POST("api/reviews/add-review")
     Call<ReviewResponse> addReview(@Body ReviewRequest reviewRequest);
 
     @GET("api/reviews/{movieId}")
     Call<List<Review>> getReviewsByMovieId(@Path("movieId") int movieId);
+
+    @HTTP(method = "DELETE", path = "api/reviews/{reviewId}", hasBody = true)
+    Call<ResponseBody> deleteReview(@Path("reviewId") String reviewId, @Body JsonObject userId);
+
 }
