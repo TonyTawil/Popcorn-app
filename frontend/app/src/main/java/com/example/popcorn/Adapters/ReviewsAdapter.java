@@ -1,6 +1,7 @@
 package com.example.popcorn.Adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.popcorn.Activities.EditReviewActivity;
 import com.example.popcorn.Models.Review;
 import com.example.popcorn.Networking.ApiService;
 import com.example.popcorn.Networking.RetrofitClient;
@@ -69,8 +71,14 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ReviewVi
 
             // Set click listeners for edit and delete icons
             holder.ivEdit.setOnClickListener(v -> {
-                // Handle edit review
+                Review review2 = reviewsList.get(position);
+                Intent intent = new Intent(context, EditReviewActivity.class);
+                intent.putExtra("reviewId", review2.getId());
+                intent.putExtra("reviewText", review2.getReviewText());
+                intent.putExtra("rating", review2.getRating());
+                context.startActivity(intent);
             });
+
 
             holder.ivDelete.setOnClickListener(v -> {
                 String reviewId = reviewsList.get(position).getId();
