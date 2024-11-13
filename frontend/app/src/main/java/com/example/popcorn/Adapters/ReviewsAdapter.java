@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,64 +54,61 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ReviewVi
     public void onBindViewHolder(@NonNull ReviewViewHolder holder, int position) {
         Review review = reviewsList.get(position);
         if (review.getUserId() != null) {
-            holder.tvReviewerName.setText(review.getUserId().getUsername()); // Correctly accessing username from User2 object
+            holder.tvReviewerName.setText(review.getUserId().getUsername());
         } else {
-            holder.tvReviewerName.setText("Anonymous"); // Fallback if username is null
-        }
-        holder.tvReviewText.setText(review.getReviewText());
-        if (review.getCreatedAt() != null) {
-            holder.tvReviewDate.setText(dateFormat.format(review.getCreatedAt())); // Formatting the date
-        } else {
-            holder.tvReviewDate.setText("No date"); // Fallback if date is null
+            holder.tvReviewerName.setText("Anonymous");
         }
 
-        // Show edit and delete icons only for the reviews made by the logged-in user
+        holder.ratingBarSmall.setRating((float)review.getRating());
+        holder.tvReviewText.setText(review.getReviewText());
+        holder.tvReviewDate.setText(review.getCreatedAt() != null ? dateFormat.format(review.getCreatedAt()) : "No date");
+
         if (review.getUserId() != null && review.getUserId().getId().equals(currentUserId)) {
             holder.ivEdit.setVisibility(View.VISIBLE);
             holder.ivDelete.setVisibility(View.VISIBLE);
 
-            // Set click listeners for edit and delete icons
             holder.ivEdit.setOnClickListener(v -> {
-                Review review2 = reviewsList.get(position);
                 Intent intent = new Intent(context, EditReviewActivity.class);
-                intent.putExtra("reviewId", review2.getId());
-                intent.putExtra("reviewText", review2.getReviewText());
-                intent.putExtra("rating", review2.getRating());
+                intent.putExtra("reviewId", review.getId());
+                intent.putExtra("reviewText", review.getReviewText());
+                intent.putExtra("rating", review.getRating());
                 context.startActivity(intent);
             });
 
-
             holder.ivDelete.setOnClickListener(v -> {
-                String reviewId = reviewsList.get(position).getId();
-                JsonObject userIdJson = new JsonObject();
-                userIdJson.addProperty("userId", currentUserId);
-
-                ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
-                Call<ResponseBody> call = apiService.deleteReview(reviewId, userIdJson);
-                call.enqueue(new Callback<ResponseBody>() {
-                    @Override
-                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                        if (response.isSuccessful()) {
-                            Toast.makeText(context, "Review deleted successfully.", Toast.LENGTH_SHORT).show();
-                            // Remove the review from the list and notify the adapter
-                            reviewsList.remove(position);
-                            notifyItemRemoved(position);
-                        } else {
-                            Toast.makeText(context, "Failed to delete review: " + response.message(), Toast.LENGTH_SHORT).show();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<ResponseBody> call, Throwable t) {
-                        Toast.makeText(context, "Error deleting review: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+                deleteReview(position);
             });
-
         } else {
             holder.ivEdit.setVisibility(View.GONE);
             holder.ivDelete.setVisibility(View.GONE);
         }
+    }
+
+    private void deleteReview(int position) {
+        String reviewId = reviewsList.get(position).getId();
+        JsonObject userIdJson = new JsonObject();
+        userIdJson.addProperty("userId", currentUserId);
+
+        ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
+        Call<ResponseBody> call = apiService.deleteReview(reviewId, userIdJson);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(context, "Review deleted successfully.", Toast.LENGTH_SHORT).show();
+                    reviewsList.remove(position);
+                    notifyItemRemoved(position);
+                    notifyItemRangeChanged(position, getItemCount());
+                } else {
+                    Toast.makeText(context, "Failed to delete review: " + response.message(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Toast.makeText(context, "Error deleting review: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
@@ -120,11 +118,13 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ReviewVi
 
     public static class ReviewViewHolder extends RecyclerView.ViewHolder {
         TextView tvReviewerName, tvReviewText, tvReviewDate;
+        RatingBar ratingBarSmall;
         ImageView ivEdit, ivDelete;
 
         public ReviewViewHolder(@NonNull View itemView) {
             super(itemView);
             tvReviewerName = itemView.findViewById(R.id.tvReviewerName);
+            ratingBarSmall = itemView.findViewById(R.id.ratingBarSmall);
             tvReviewText = itemView.findViewById(R.id.tvReviewText);
             tvReviewDate = itemView.findViewById(R.id.tvReviewDate);
             ivEdit = itemView.findViewById(R.id.ivEdit);

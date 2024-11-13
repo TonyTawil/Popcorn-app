@@ -69,10 +69,15 @@ public class EditReviewActivity extends AppCompatActivity {
     private void loadInitialData() {
         Intent intent = getIntent();
         String reviewText = intent.getStringExtra("reviewText");
-        float rating = intent.getFloatExtra("rating", 0);
+        float rating = intent.getFloatExtra("rating", 0); // Ensure default is sensible
+
+        Log.d("EditReviewActivity", "Loaded review text: " + reviewText);
+        Log.d("EditReviewActivity", "Loaded rating: " + rating);
+
         reviewEditText.setText(reviewText);
         ratingBar.setRating(rating);
     }
+
 
     private void submitReview() {
         String reviewText = reviewEditText.getText().toString();
