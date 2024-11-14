@@ -3,6 +3,7 @@ package com.example.popcorn.Activities;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -16,26 +17,32 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.popcorn.Adapters.MoviesAdapter;
 import com.example.popcorn.Adapters.PeopleAdapter;
+import com.example.popcorn.DTOs.MoviesResponse;
 import com.example.popcorn.DTOs.WatchedAddRequest;
 import com.example.popcorn.DTOs.WatchedAddResponse;
 import com.example.popcorn.DTOs.WatchlistAddRequest;
 import com.example.popcorn.DTOs.WatchlistAddResponse;
+import com.example.popcorn.Models.Movie;
 import com.example.popcorn.Models.Person;
 import com.example.popcorn.Networking.ApiService;
+import com.example.popcorn.Networking.FetchMoviesTask;
+import com.example.popcorn.Networking.FetchSimilarMoviesTask;
 import com.example.popcorn.Networking.RetrofitClient;
 import com.example.popcorn.R;
 import com.example.popcorn.Utils.NavigationManager;
 import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MovieDetailsActivity extends AppCompatActivity {
-    private RecyclerView castRecyclerView, crewRecyclerView;
+    private RecyclerView castRecyclerView, crewRecyclerView, similarMoviesRecyclerView;
     private DrawerLayout drawerLayout;
     private NavigationManager navigationManager;
     private Button addToWatchlistButton, markAsWatchedButton, addReviewButton, viewReviewsButton;
@@ -73,6 +80,10 @@ public class MovieDetailsActivity extends AppCompatActivity {
 
         displayMovieDetails(moviePosterImageView, movieTitleTextView, moviePlotTextView);
         initRecyclerViews();
+        // After initializing other views
+        RecyclerView similarMoviesRecyclerView = findViewById(R.id.similarMoviesRecyclerView);
+        new FetchSimilarMoviesTask(similarMoviesRecyclerView, movieId).execute();
+
 
         addToWatchlistButton = findViewById(R.id.addToWatchlistButton);
         markAsWatchedButton = findViewById(R.id.markAsWatchedButton);
@@ -214,5 +225,4 @@ public class MovieDetailsActivity extends AppCompatActivity {
         });
     }
 
-    // Add your methods for addToWatchlist and addToWatched here, ensuring they handle the SharedPreferences correctly
 }

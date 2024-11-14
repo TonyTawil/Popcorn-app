@@ -77,4 +77,8 @@ public interface ApiService {
 
     @PUT("api/reviews/{reviewId}")
     Call<ReviewResponse> updateReview(@Path("reviewId") String reviewId, @Body ReviewRequest reviewRequest);
+
+    @GET("api/tmdb/similar/{movieId}")
+    Call<MoviesResponse> getSimilarMovies(@Path("movieId") int movieId);
+
 }
