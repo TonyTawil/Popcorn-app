@@ -11,7 +11,7 @@ const replySchema = new mongoose.Schema({
 const reviewSchema = new mongoose.Schema({
   movieId: { type: Number, required: true },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  rating: { type: Number, required: true, min: 0, max: 10 },
+  rating: { type: Number, required: true, min: 0, max: 5 },
   reviewText: { type: String, required: false },
   replies: [replySchema],
   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
