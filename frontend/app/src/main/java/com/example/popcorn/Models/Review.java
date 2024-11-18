@@ -7,7 +7,7 @@ public class Review {
     private String _id;
     private int movieId;
     private User2 userId;  // Use User2 object instead of String
-    private int rating;
+    private float rating;
     private String reviewText;
     private List<String> likes;
     private int likesCount;
@@ -16,7 +16,7 @@ public class Review {
     private int __v;
 
     // Constructor
-    public Review(String _id, int movieId, User2 userId, int rating, String reviewText, List<String> likes, int likesCount, List<Reply> replies, Date createdAt, int __v) {
+    public Review(String _id, int movieId, User2 userId, float rating, String reviewText, List<String> likes, int likesCount, List<Reply> replies, Date createdAt, int __v) {
         this._id = _id;
         this.movieId = movieId;
         this.userId = userId;
@@ -54,7 +54,7 @@ public class Review {
         this.userId = userId;
     }
 
-    public int getRating() {
+    public float getRating() {
         return rating;
     }
 

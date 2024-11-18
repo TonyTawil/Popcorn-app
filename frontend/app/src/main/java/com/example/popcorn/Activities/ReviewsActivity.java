@@ -86,15 +86,18 @@ public class ReviewsActivity extends AppCompatActivity {
                     }
                 } else {
                     Toast.makeText(ReviewsActivity.this, "Failed to fetch reviews.", Toast.LENGTH_SHORT).show();
+                    Log.e("ReviewsActivity", "Failed to fetch reviews: " + response.code() + " " + response.message());
                 }
             }
 
             @Override
             public void onFailure(Call<List<Review>> call, Throwable t) {
                 Toast.makeText(ReviewsActivity.this, "Error fetching reviews.", Toast.LENGTH_LONG).show();
+                Log.e("ReviewsActivity", "Error fetching reviews: " + t.getMessage());
             }
         });
     }
+
 
     private boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
