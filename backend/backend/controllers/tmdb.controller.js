@@ -62,3 +62,18 @@ export const getSimilarMovies = async (req, res) => {
     });
   }
 };
+
+export const getMovieById = async (req, res) => {
+  const { movieId } = req.params;
+  try {
+    const response = await axios.get(
+      `https://api.themoviedb.org/3/movie/${movieId}?api_key=${process.env.API_KEY}`
+    );
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({
+      message: `Error fetching movie with ID ${movieId}`,
+      error: error.message,
+    });
+  }
+};

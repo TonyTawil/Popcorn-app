@@ -4,6 +4,7 @@ import {
   getMoviesByType,
   getMovieCredits,
   getSimilarMovies,
+  getMovieById,
 } from "../controllers/tmdb.controller.js";
 
 const router = express.Router();
@@ -12,5 +13,6 @@ router.get("/movie/trending", getTrending);
 router.get("/:type", getMoviesByType);
 router.get("/credits/:movieId", getMovieCredits);
 router.get("/similar/:movieId", getSimilarMovies);
+router.get("/movie/:movieId", getMovieById);
 
 export default router;
