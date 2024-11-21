@@ -49,6 +49,18 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
         holder.titleTextView.setText(movie.getTitle());
         Glide.with(context).load(movie.getPosterPath()).into(holder.posterImageView);
 
+        String posterPath = movie.getPosterPath();
+        if (posterPath != null && !posterPath.startsWith("http")) {
+            posterPath = "https://image.tmdb.org/t/p/w500" + posterPath;
+        }
+
+        // Load the image using Glide with error handling
+        Glide.with(context)
+                .load(posterPath)
+                .placeholder(R.drawable.placeholder) // Assuming 'placeholder' is a valid drawable resource ID
+                .error(R.drawable.movie) // Assuming 'error_image' is a valid drawable resource ID
+                .into(holder.posterImageView);
+
         holder.itemView.setOnClickListener(v -> {
             updateSharedPreferences(movie.getMovieId());
             Intent intent = new Intent(context, MovieDetailsActivity.class);

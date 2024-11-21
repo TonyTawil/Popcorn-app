@@ -7,7 +7,7 @@ import java.util.List;
 public class Movie {
     private int movieId;
     private String title;
-    private String posterPath;
+    private String poster_path;
     private String plot;
     private List<Person> cast;
     private List<Person> crew;
@@ -15,10 +15,10 @@ public class Movie {
     // Base URL for movie posters
     private static final String BASE_IMAGE_URL = "https://image.tmdb.org/t/p/w500";
 
-    public Movie(int movieId, String title, String posterPath, String plot, List<Person> cast, List<Person> crew) {
+    public Movie(int movieId, String title, String poster_path, String plot, List<Person> cast, List<Person> crew) {
         this.movieId = movieId;
         this.title = title;
-        this.setPosterPath(posterPath); // Use setter to format URL
+        setPosterPath(poster_path);
         this.plot = plot;
         this.cast = cast;
         this.crew = crew;
@@ -34,11 +34,11 @@ public class Movie {
         this.title = title;
     }
 
-    public void setPosterPath(String posterPath) {
-        if (posterPath != null && !posterPath.isEmpty()) {
-            this.posterPath = BASE_IMAGE_URL + posterPath;
+    public void setPosterPath(String poster_path) {
+        if (poster_path != null && !poster_path.isEmpty()) {
+            this.poster_path = BASE_IMAGE_URL + poster_path;
         } else {
-            this.posterPath = null; // Handle null or empty paths appropriately
+            this.poster_path = null; // Handle null or empty paths appropriately
         }
     }
 
@@ -63,7 +63,7 @@ public class Movie {
     }
 
     public String getPosterPath() {
-        return posterPath;
+        return poster_path;
     }
 
     public String getPlot() {

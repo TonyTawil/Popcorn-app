@@ -5,9 +5,13 @@ import android.util.Log;
 import android.widget.Toast;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.popcorn.DTOs.CreditsResponse;
+import com.example.popcorn.Models.CastMember;
+import com.example.popcorn.Models.CrewMember;
 import com.example.popcorn.Models.Movie;
 import com.example.popcorn.Models.Person;
 import com.example.popcorn.Adapters.MoviesAdapter;
+import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,6 +24,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Response;
 
 public class FetchMoviesTask extends AsyncTask<Void, Void, List<Movie>> {
     private static final String TAG = "FetchMoviesTask";
@@ -115,61 +122,42 @@ public class FetchMoviesTask extends AsyncTask<Void, Void, List<Movie>> {
 
 
     private List<Person> fetchCredits(int movieId, String type) {
-        List<Person> people = new ArrayList<>();
-        HttpURLConnection connection = null;
-        BufferedReader reader = null;
+        ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
+        Call<CreditsResponse> call = apiService.fetchMovieCredits(movieId);
+
         try {
-            URL url = new URL("https://api.themoviedb.org/3/movie/" + movieId + "/credits?api_key=dd3d9dbf9084e05fc04b0252cbe3da26");
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.connect();
-
-            InputStream inputStream = connection.getInputStream();
-            StringBuilder buffer = new StringBuilder();
-            if (inputStream == null) {
+            Response<CreditsResponse> response = call.execute();  // Synchronous Retrofit call
+            if (response.isSuccessful() && response.body() != null) {
+                CreditsResponse credits = response.body();
+                List<Person> people = new ArrayList<>();
+                if ("cast".equals(type)) {
+                    for (CastMember member : credits.getCast()) {
+                        String imageUrl = member.getImageUrl();
+                        if (imageUrl != null && !imageUrl.isEmpty()) {
+                            imageUrl = "https://image.tmdb.org/t/p/w500" + imageUrl;
+                        }
+                        people.add(new Person(member.getName(), member.getCharacter(), imageUrl));
+                    }
+                } else if ("crew".equals(type)) {
+                    for (CrewMember member : credits.getCrew()) {
+                        String imageUrl = member.getImageUrl();
+                        if (imageUrl != null && !imageUrl.isEmpty()) {
+                            imageUrl = "https://image.tmdb.org/t/p/w500" + imageUrl;
+                        }
+                        people.add(new Person(member.getName(), member.getJob(), imageUrl));
+                    }
+                }
                 return people;
+            } else {
+                // Log error body if response is not successful
+                String errorBody = response.errorBody() != null ? response.errorBody().string() : "null";
+                Log.e(TAG, "Unsuccessful API Call: " + errorBody);
             }
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                buffer.append(line).append("\n");
-            }
-
-            String jsonStr = buffer.toString();
-            JSONObject json = new JSONObject(jsonStr);
-            JSONArray peopleArray = json.getJSONArray(type);
-
-            for (int i = 0; i < peopleArray.length(); i++) {
-                JSONObject person = peopleArray.getJSONObject(i);
-                String name = person.getString("name");
-                String role = type.equals("cast") ? person.getString("character") : person.getString("job");
-                String imageUrl = person.optString("profile_path");
-                if (imageUrl != null && !imageUrl.isEmpty()) {
-                    imageUrl = "https://image.tmdb.org/t/p/w500" + imageUrl;
-                }
-                people.add(new Person(name, role, imageUrl));
-            }
-        } catch (IOException | JSONException e) {
+        } catch (IOException e) {
             Log.e(TAG, "Error fetching credits", e);
-            return null; // Ensure null is returned if there's an error
-        } finally {
-            if (connection != null) {
-                connection.disconnect();
-            }
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    Log.e(TAG, "Error closing stream", e);
-                }
-            }
         }
-        return people;
+        return new ArrayList<>();
     }
-
-
-
 
 
     @Override

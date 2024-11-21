@@ -1,26 +1,20 @@
 package com.example.popcorn.DTOs;
 
+import com.example.popcorn.Models.CastMember;
+import com.example.popcorn.Models.CrewMember;
 import com.example.popcorn.Models.Person;
+
 import java.util.List;
 
 public class CreditsResponse {
-    private List<Person> cast;
-    private List<Person> crew;
+    private List<CastMember> cast;
+    private List<CrewMember> crew;
 
-    // Getters and Setters
-    public List<Person> getCast() {
+    public List<CastMember> getCast() {
         return cast;
     }
 
-    public void setCast(List<Person> cast) {
-        this.cast = cast;
-    }
-
-    public List<Person> getCrew() {
+    public List<CrewMember> getCrew() {
         return crew;
-    }
-
-    public void setCrew(List<Person> crew) {
-        this.crew = crew;
     }
 }

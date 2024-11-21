@@ -6,25 +6,25 @@ import android.os.Parcelable;
 public class Person implements Parcelable {
     private String name;
     private String role;
-    private String imageUrl; // URL for the image
+    private String profile_path;
 
-    public Person(String name, String role, String imageUrl) {
+    public Person(String name, String role, String profile_path) {
         this.name = name;
         this.role = role;
-        this.imageUrl = imageUrl;
+        this.profile_path = profile_path;
     }
 
     protected Person(Parcel in) {
         name = in.readString();
         role = in.readString();
-        imageUrl = in.readString();
+        profile_path = in.readString();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(name);
         dest.writeString(role);
-        dest.writeString(imageUrl);
+        dest.writeString(profile_path);
     }
 
     @Override
@@ -53,6 +53,6 @@ public class Person implements Parcelable {
     }
 
     public String getImageUrl() {
-        return imageUrl;
+        return profile_path;
     }
 }

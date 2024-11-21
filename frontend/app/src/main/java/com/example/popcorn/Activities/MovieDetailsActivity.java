@@ -17,17 +17,18 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.popcorn.Adapters.MoviesAdapter;
 import com.example.popcorn.Adapters.PeopleAdapter;
-import com.example.popcorn.DTOs.MoviesResponse;
+import com.example.popcorn.DTOs.CreditsResponse;
+import com.example.popcorn.DTOs.MovieResponse;
 import com.example.popcorn.DTOs.WatchedAddRequest;
 import com.example.popcorn.DTOs.WatchedAddResponse;
 import com.example.popcorn.DTOs.WatchlistAddRequest;
 import com.example.popcorn.DTOs.WatchlistAddResponse;
+import com.example.popcorn.Models.CastMember;
+import com.example.popcorn.Models.CrewMember;
 import com.example.popcorn.Models.Movie;
 import com.example.popcorn.Models.Person;
 import com.example.popcorn.Networking.ApiService;
-import com.example.popcorn.Networking.FetchMoviesTask;
 import com.example.popcorn.Networking.FetchSimilarMoviesTask;
 import com.example.popcorn.Networking.RetrofitClient;
 import com.example.popcorn.R;
@@ -57,7 +58,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
         movieId = getIntent().getIntExtra("movieId", -1);
         if (movieId == -1) {
-            Toast.makeText(this, "Invalid movie details", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Invalid movie ID", Toast.LENGTH_LONG).show();
             finish();
             return;
         }
@@ -72,18 +73,14 @@ public class MovieDetailsActivity extends AppCompatActivity {
         navigationManager.updateDrawerContents();
         setupDrawer(toolbar);
 
-        ImageView moviePosterImageView = findViewById(R.id.moviePosterImageView);
-        TextView movieTitleTextView = findViewById(R.id.movieTitleTextView);
-        TextView moviePlotTextView = findViewById(R.id.moviePlotTextView);
         castRecyclerView = findViewById(R.id.castRecyclerView);
         crewRecyclerView = findViewById(R.id.crewRecyclerView);
+        similarMoviesRecyclerView = findViewById(R.id.similarMoviesRecyclerView);
+        similarMoviesRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
-        displayMovieDetails(moviePosterImageView, movieTitleTextView, moviePlotTextView);
+        displayMovieDetails();
         initRecyclerViews();
-        // After initializing other views
-        RecyclerView similarMoviesRecyclerView = findViewById(R.id.similarMoviesRecyclerView);
-        new FetchSimilarMoviesTask(similarMoviesRecyclerView, movieId).execute();
-
+        fetchSimilarMovies();
 
         addToWatchlistButton = findViewById(R.id.addToWatchlistButton);
         markAsWatchedButton = findViewById(R.id.markAsWatchedButton);
@@ -98,6 +95,10 @@ public class MovieDetailsActivity extends AppCompatActivity {
         setupNavigationMenu(navigationView);
     }
 
+    private void fetchSimilarMovies() {
+        new FetchSimilarMoviesTask(similarMoviesRecyclerView, movieId).execute();
+    }
+
     private void setupDrawer(Toolbar toolbar) {
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawerLayout, toolbar,
@@ -108,25 +109,91 @@ public class MovieDetailsActivity extends AppCompatActivity {
         toggle.getDrawerArrowDrawable().setColor(getResources().getColor(android.R.color.white));
     }
 
-    private void displayMovieDetails(ImageView moviePosterImageView, TextView movieTitleTextView, TextView moviePlotTextView) {
-        Intent intent = getIntent();
-        String title = intent.getStringExtra("title");
-        String posterPath = intent.getStringExtra("posterPath");
-        String plot = intent.getStringExtra("plot");
+    private void displayMovieDetails() {
+        ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
+        Call<MovieResponse> call = apiService.getMovieDetails(movieId);
+        call.enqueue(new Callback<MovieResponse>() {
+            @Override
+            public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    MovieResponse movie = response.body();
 
-        movieTitleTextView.setText(title);
-        moviePlotTextView.setText(plot);
-        Glide.with(this).load(posterPath).into(moviePosterImageView);
+                    // Log the complete movie response
+                    Log.d("MovieDetailsActivity", "Movie Response: " + movie.toString());
+
+                    ImageView moviePosterImageView = findViewById(R.id.moviePosterImageView);
+                    TextView movieTitleTextView = findViewById(R.id.movieTitleTextView);
+                    TextView moviePlotTextView = findViewById(R.id.moviePlotTextView);
+
+                    movieTitleTextView.setText(movie.getTitle());
+                    moviePlotTextView.setText(movie.getOverview());
+
+                    // Check if the poster path is not null and prepend the base URL if it's not already included
+                    String posterPath = movie.getPosterPath();
+                    if (posterPath != null && !posterPath.startsWith("http")) {
+                        posterPath = "https://image.tmdb.org/t/p/w500" + posterPath;
+                    }
+
+                    // Log the final poster path to help with debugging
+                    Log.d("MovieDetailsActivity", "Poster Path: " + posterPath);
+
+                    // Use Glide to load the poster image
+                    Glide.with(MovieDetailsActivity.this).load(posterPath).into(moviePosterImageView);
+                } else {
+                    Toast.makeText(MovieDetailsActivity.this, "Failed to load movie details", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MovieResponse> call, Throwable t) {
+                Log.e("MovieDetailsActivity", "Error loading movie details: " + t.getMessage());
+                Toast.makeText(MovieDetailsActivity.this, "Error loading movie details: " + t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
+
+
+    // Add this method to MovieDetailsActivity
     private void initRecyclerViews() {
-        ArrayList<Person> cast = getIntent().getParcelableArrayListExtra("cast");
-        ArrayList<Person> crew = getIntent().getParcelableArrayListExtra("crew");
-        castRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        crewRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        castRecyclerView.setAdapter(new PeopleAdapter(this, cast));
-        crewRecyclerView.setAdapter(new PeopleAdapter(this, crew));
+        castRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        crewRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+
+        ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
+        Call<CreditsResponse> call = apiService.fetchMovieCredits(movieId);
+
+        call.enqueue(new Callback<CreditsResponse>() {
+            @Override
+            public void onResponse(Call<CreditsResponse> call, Response<CreditsResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    CreditsResponse creditsResponse = response.body();
+
+                    List<Person> cast = new ArrayList<>();
+                    for (CastMember member : creditsResponse.getCast()) {
+                        cast.add(new Person(member.getName(), member.getCharacter(), member.getImageUrl()));
+                    }
+
+                    List<Person> crew = new ArrayList<>();
+                    for (CrewMember member : creditsResponse.getCrew()) {
+                        crew.add(new Person(member.getName(), member.getJob(), member.getImageUrl()));
+                    }
+
+                    castRecyclerView.setAdapter(new PeopleAdapter(MovieDetailsActivity.this, cast));
+                    crewRecyclerView.setAdapter(new PeopleAdapter(MovieDetailsActivity.this, crew));
+                } else {
+                    Log.e("MovieDetailsActivity", "Failed to fetch credits: " + response.errorBody());
+                    Toast.makeText(MovieDetailsActivity.this, "Failed to load credits", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CreditsResponse> call, Throwable t) {
+                Log.e("MovieDetailsActivity", "Error loading credits", t);
+                Toast.makeText(MovieDetailsActivity.this, "Error loading credits: " + t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
     }
+
 
     private void openAddReviewActivity() {
         String userId = sharedPreferences.getString("userId", null);
@@ -204,10 +271,8 @@ public class MovieDetailsActivity extends AppCompatActivity {
             Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show();
             return;
         }
-        String title = getIntent().getStringExtra("title");
-        String posterPath = getIntent().getStringExtra("posterPath");
         ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
-        WatchedAddRequest request = new WatchedAddRequest(userId, movieId, title, posterPath);
+        WatchedAddRequest request = new WatchedAddRequest(userId, movieId, getIntent().getStringExtra("title"), getIntent().getStringExtra("posterPath"));
         apiService.addToWatched(request).enqueue(new Callback<WatchedAddResponse>() {
             @Override
             public void onResponse(Call<WatchedAddResponse> call, Response<WatchedAddResponse> response) {
@@ -224,5 +289,4 @@ public class MovieDetailsActivity extends AppCompatActivity {
             }
         });
     }
-
 }

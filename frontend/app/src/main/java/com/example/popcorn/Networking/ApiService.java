@@ -2,6 +2,7 @@ package com.example.popcorn.Networking;
 
 import com.example.popcorn.DTOs.CreditsResponse;
 import com.example.popcorn.DTOs.LoginUser;
+import com.example.popcorn.DTOs.MovieResponse;
 import com.example.popcorn.DTOs.MoviesResponse;
 import com.example.popcorn.DTOs.ReviewRequest;
 import com.example.popcorn.DTOs.ReviewResponse;
@@ -80,5 +81,11 @@ public interface ApiService {
 
     @GET("api/tmdb/similar/{movieId}")
     Call<MoviesResponse> getSimilarMovies(@Path("movieId") int movieId);
+
+    @GET("api/tmdb/movie/{movieId}")
+    Call<MovieResponse> getMovieDetails(@Path("movieId") int movieId);
+
+    @GET("api/tmdb/credits/{movieId}")
+    Call<CreditsResponse> fetchMovieCredits(@Path("movieId") int movieId);
 
 }

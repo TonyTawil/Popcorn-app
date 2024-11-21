@@ -6,54 +6,63 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.bumptech.glide.Glide;
 import com.example.popcorn.Models.Person;
 import com.example.popcorn.R;
 
 import java.util.List;
 
-public class PeopleAdapter extends RecyclerView.Adapter<PeopleAdapter.PersonViewHolder> {
-    private List<Person> people;
+public class PeopleAdapter extends RecyclerView.Adapter<PeopleAdapter.ViewHolder> {
+
     private Context context;
+    private List<Person> peopleList;
 
-    public PeopleAdapter(Context context, List<Person> people) {
+    public PeopleAdapter(Context context, List<Person> peopleList) {
         this.context = context;
-        this.people = people;
+        this.peopleList = peopleList;
+    }
+
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(context).inflate(R.layout.person_item, parent, false);
+        return new ViewHolder(view);
     }
 
     @Override
-    public PersonViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.person_item, parent, false);
-        return new PersonViewHolder(view);
-    }
-
-    @Override
-    public void onBindViewHolder(PersonViewHolder holder, int position) {
-        Person person = people.get(position);
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        Person person = peopleList.get(position);
         holder.nameTextView.setText(person.getName());
         holder.roleTextView.setText(person.getRole());
-        if (person.getImageUrl() != null && !person.getImageUrl().isEmpty()) {
-            Glide.with(context).load(person.getImageUrl()).placeholder(R.drawable.placeholder).into(holder.personImageView);
-        } else {
-            holder.personImageView.setImageResource(R.drawable.placeholder); // Default placeholder if no image
-        }
+
+        Glide.with(context)
+                .load(person.getImageUrl())
+                .placeholder(R.drawable.placeholder)
+                .error(R.drawable.placeholder)
+                .into(holder.imageView);
     }
 
     @Override
     public int getItemCount() {
-        return people != null ? people.size() : 0;
+        return peopleList.size();
     }
 
-    public static class PersonViewHolder extends RecyclerView.ViewHolder {
-        TextView nameTextView, roleTextView;
-        ImageView personImageView;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        TextView nameTextView;
+        TextView roleTextView;
+        ImageView imageView;
 
-        public PersonViewHolder(View itemView) {
+        public ViewHolder(View itemView) {
             super(itemView);
             nameTextView = itemView.findViewById(R.id.nameTextView);
             roleTextView = itemView.findViewById(R.id.roleTextView);
-            personImageView = itemView.findViewById(R.id.personImageView);
+            imageView = itemView.findViewById(R.id.personImageView);
         }
     }
+
+
 }
