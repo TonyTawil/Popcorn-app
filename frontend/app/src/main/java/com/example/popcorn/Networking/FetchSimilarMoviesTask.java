@@ -34,7 +34,6 @@ public class FetchSimilarMoviesTask extends AsyncTask<Void, Void, List<Movie>> {
         try {
             Response<MoviesResponse> response = call.execute();
             if (response.isSuccessful() && response.body() != null) {
-                logResponseBody(response.body());
                 return response.body().getResults();
             } else {
                 Log.e(TAG, "Error fetching similar movies: " + response.errorBody());
@@ -49,18 +48,11 @@ public class FetchSimilarMoviesTask extends AsyncTask<Void, Void, List<Movie>> {
     @Override
     protected void onPostExecute(List<Movie> movies) {
         if (movies != null && !movies.isEmpty()) {
-            MoviesAdapter adapter = new MoviesAdapter(recyclerView.getContext(), movies, false, "none");
-            recyclerView.setAdapter(adapter);
+            recyclerView.setAdapter(new MoviesAdapter(recyclerView.getContext(), movies, false, "none"));
+
         } else {
             Toast.makeText(recyclerView.getContext(), "No similar movies found", Toast.LENGTH_LONG).show();
         }
     }
 
-    private void logResponseBody(MoviesResponse responseBody) {
-        try {
-            Log.d(TAG, "Response Body: " + responseBody); // Using the responseBody's toString method for logging
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to log response body", e);
-        }
-    }
 }

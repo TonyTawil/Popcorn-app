@@ -5,7 +5,7 @@ import com.example.popcorn.Models.Person;
 import java.util.List;
 
 public class Movie {
-    private int movieId;
+    private int id;
     private String title;
     private String poster_path;
     private String plot;
@@ -15,8 +15,8 @@ public class Movie {
     // Base URL for movie posters
     private static final String BASE_IMAGE_URL = "https://image.tmdb.org/t/p/w500";
 
-    public Movie(int movieId, String title, String poster_path, String plot, List<Person> cast, List<Person> crew) {
-        this.movieId = movieId;
+    public Movie(int id, String title, String poster_path, String plot, List<Person> cast, List<Person> crew) {
+        this.id = id;
         this.title = title;
         setPosterPath(poster_path);
         this.plot = plot;
@@ -27,7 +27,7 @@ public class Movie {
     public Movie() {}
 
     public void setMovieId(int movieId) {
-        this.movieId = movieId;
+        this.id = movieId;
     }
 
     public void setTitle(String title) {
@@ -55,7 +55,7 @@ public class Movie {
     }
 
     public int getMovieId() {
-        return movieId;
+        return id;
     }
 
     public String getTitle() {

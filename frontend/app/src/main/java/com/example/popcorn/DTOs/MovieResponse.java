@@ -9,7 +9,7 @@ public class MovieResponse {
     private long budget;
     private List<Genre> genres;
     private String homepage;
-    private int id;
+    private int movieId;
     private String imdbId;
     private List<String> originCountry;
     private String originalLanguage;
@@ -49,8 +49,8 @@ public class MovieResponse {
     public String getHomepage() { return homepage; }
     public void setHomepage(String homepage) { this.homepage = homepage; }
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public int getId() { return movieId; }
+    public void setId(int movieId) { this.movieId = movieId; }
 
     public String getImdbId() { return imdbId; }
     public void setImdbId(String imdbId) { this.imdbId = imdbId; }

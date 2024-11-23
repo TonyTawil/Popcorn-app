@@ -3,6 +3,7 @@ package com.example.popcorn.Adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,14 +63,18 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
                 .into(holder.posterImageView);
 
         holder.itemView.setOnClickListener(v -> {
+            Log.d("Elie Raad","ID: " + movie.getMovieId());
             updateSharedPreferences(movie.getMovieId());
             Intent intent = new Intent(context, MovieDetailsActivity.class);
             intent.putExtra("movieId", movie.getMovieId());
             intent.putExtra("title", movie.getTitle());
             intent.putExtra("posterPath", movie.getPosterPath());
             intent.putExtra("plot", movie.getPlot());
-            intent.putParcelableArrayListExtra("cast", new ArrayList<>(movie.getCast()));
-            intent.putParcelableArrayListExtra("crew", new ArrayList<>(movie.getCrew()));
+
+            // Proper null checks before putting them into the intent
+            intent.putParcelableArrayListExtra("cast", movie.getCast() != null ? new ArrayList<>(movie.getCast()) : new ArrayList<>());
+            intent.putParcelableArrayListExtra("crew", movie.getCrew() != null ? new ArrayList<>(movie.getCrew()) : new ArrayList<>());
+
             context.startActivity(intent);
         });
 
