@@ -43,7 +43,7 @@
                 android:id="@+id/trendingTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Trending"
+                android:text="Popular"
                 android:textColor="@android:color/white"
                 android:textSize="36sp"
                 android:textStyle="bold"

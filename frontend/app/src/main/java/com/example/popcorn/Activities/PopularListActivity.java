@@ -16,7 +16,7 @@ import com.example.popcorn.R;
 import com.example.popcorn.Utils.NavigationManager;
 import com.google.android.material.navigation.NavigationView;
 
-public class MovieListActivity extends AppCompatActivity {
+public class PopularListActivity extends AppCompatActivity {
 
     RecyclerView moviesRecyclerView;
     Button btnNext, btnPrevious;
@@ -27,7 +27,7 @@ public class MovieListActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_movie_list);
+        setContentView(R.layout.activity_popular_list);
 
         Toolbar toolbar = findViewById(R.id.appBarLayout);
         setSupportActionBar(toolbar);
@@ -52,19 +52,19 @@ public class MovieListActivity extends AppCompatActivity {
         btnNext = findViewById(R.id.btnNext);
         btnPrevious = findViewById(R.id.btnPrevious);
 
-        loadMovies(currentPage, "trending");
+        loadMovies(currentPage, "popular");
         updateButtons();
 
         btnNext.setOnClickListener(v -> {
             currentPage++;
-            loadMovies(currentPage, "trending");
+            loadMovies(currentPage, "popular");
             updateButtons();
         });
 
         btnPrevious.setOnClickListener(v -> {
             if (currentPage > 1) {
                 currentPage--;
-                loadMovies(currentPage, "trending");
+                loadMovies(currentPage, "popular");
                 updateButtons();
             }
         });
@@ -95,7 +95,7 @@ public class MovieListActivity extends AppCompatActivity {
     }
 
     private void loadMovies(int page, String category) {
-        new FetchMoviesTask(moviesRecyclerView, page, 10, category).execute();
+        new FetchMoviesTask(moviesRecyclerView, page, category).execute();
     }
 
     private void updateButtons() {

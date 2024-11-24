@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         // Setup RecyclerViews and Buttons
         setupRecyclerViews();
 
-        showMoreButton.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, MovieListActivity.class)));
+        showMoreButton.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, PopularListActivity.class)));
         showMoreNowPlayingButton.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, NowPlayingListActivity.class)));
         showMoreUpcomingButton.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, UpcomingListActivity.class)));
 
@@ -89,8 +89,8 @@ public class MainActivity extends AppCompatActivity {
         nowPlayingRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         upcomingRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        new FetchMoviesTask(moviesRecyclerView, 1, 5,"trending").execute();
-        new FetchMoviesTask(nowPlayingRecyclerView, 1, 5, "now_playing").execute();
-        new FetchMoviesTask(upcomingRecyclerView, 1, 5, "upcoming").execute();
+        new FetchMoviesTask(moviesRecyclerView, 1, "popular").execute();
+        new FetchMoviesTask(nowPlayingRecyclerView, 1, "now_playing").execute();
+        new FetchMoviesTask(upcomingRecyclerView, 1, "upcoming").execute();
     }
 }
