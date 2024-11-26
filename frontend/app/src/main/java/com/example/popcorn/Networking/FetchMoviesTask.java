@@ -6,7 +6,6 @@ import android.widget.Toast;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.popcorn.DTOs.CreditsResponse;
-import com.example.popcorn.DTOs.MovieResponse;
 import com.example.popcorn.DTOs.MoviesResponse;
 import com.example.popcorn.Models.CastMember;
 import com.example.popcorn.Models.CrewMember;
@@ -24,11 +23,13 @@ public class FetchMoviesTask extends AsyncTask<Void, Void, List<Movie>> {
     private static final String TAG = "FetchMoviesTask";
     private RecyclerView recyclerView;
     private int page;
+    private int itemsPerPage;  // Number of items to display
     private String movieType;  // "trending" or "now_playing"
 
-    public FetchMoviesTask(RecyclerView recyclerView, int page, String movieType) {
+    public FetchMoviesTask(RecyclerView recyclerView, int page, int itemsPerPage, String movieType) {
         this.recyclerView = recyclerView;
         this.page = page;
+        this.itemsPerPage = itemsPerPage;
         this.movieType = movieType;
     }
 
@@ -57,7 +58,7 @@ public class FetchMoviesTask extends AsyncTask<Void, Void, List<Movie>> {
 
     private List<Movie> parseMoviesFromJson(MoviesResponse moviesResponse) {
         List<Movie> results = new ArrayList<>();
-        for (Movie movieResponse : moviesResponse.getResults()) {
+        for (Movie movieResponse : moviesResponse.getResults().subList(0, Math.min(itemsPerPage, moviesResponse.getResults().size()))) {
             int movieId = movieResponse.getMovieId();
             String title = movieResponse.getTitle();
             String posterPath = movieResponse.getPosterPath();

@@ -89,8 +89,8 @@ public class MainActivity extends AppCompatActivity {
         nowPlayingRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         upcomingRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        new FetchMoviesTask(moviesRecyclerView, 1, "popular").execute();
-        new FetchMoviesTask(nowPlayingRecyclerView, 1, "now_playing").execute();
-        new FetchMoviesTask(upcomingRecyclerView, 1, "upcoming").execute();
+        new FetchMoviesTask(moviesRecyclerView, 1, 5, "popular").execute();
+        new FetchMoviesTask(nowPlayingRecyclerView, 1, 5, "now_playing").execute();
+        new FetchMoviesTask(upcomingRecyclerView, 1, 5, "upcoming").execute();
     }
 }
