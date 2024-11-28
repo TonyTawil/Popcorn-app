@@ -25,7 +25,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ReviewsActivity extends AppCompatActivity {
-    private static final int EDIT_REVIEW_REQUEST = 100; // Unique request code
+    private static final int EDIT_REVIEW_REQUEST = 100;
     private RecyclerView reviewsRecyclerView;
     private ReviewsAdapter reviewsAdapter;
     private int movieId;
@@ -128,7 +128,6 @@ public class ReviewsActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == EDIT_REVIEW_REQUEST && resultCode == RESULT_OK) {
-            // Reload reviews from the server to reflect the updated review
             loadReviews();
         }
     }

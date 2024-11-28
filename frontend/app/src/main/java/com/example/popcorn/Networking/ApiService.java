@@ -37,7 +37,7 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface ApiService {
-    // Authentication related endpoints
+
     @POST("api/auth/signup")
     Call<UserResponse> createUser(@Body User user);
 
@@ -47,7 +47,6 @@ public interface ApiService {
     @GET("api/auth/is-verified/{userId}")
     Call<VerificationResponse> checkEmailVerified(@Path("userId") String userId);
 
-    // Watchlist related endpoints
     @POST("api/movies/get-watchlist")
     Call<WatchlistResponse> fetchWatchlist(@Body WatchlistRequest request);
 
@@ -57,7 +56,6 @@ public interface ApiService {
     @POST("api/movies/remove-from-watchlist")
     Call<ResponseBody> removeFromWatchlist(@Body WatchlistRemoveRequest request);
 
-    // Watched list related endpoints
     @POST("api/movies/get-watched")
     Call<WatchedResponse> fetchWatched(@Body WatchedRequest request);
 

@@ -6,16 +6,15 @@ import java.util.List;
 public class Review {
     private String _id;
     private int movieId;
-    private User2 userId;  // Use User2 object instead of String
+    private User2 userId;
     private float rating;
     private String reviewText;
     private List<String> likes;
     private int likesCount;
-    private List<Reply> replies;  // Assuming you have a Reply class defined somewhere
+    private List<Reply> replies;
     private Date createdAt;
     private int __v;
 
-    // Constructor
     public Review(String _id, int movieId, User2 userId, float rating, String reviewText, List<String> likes, int likesCount, List<Reply> replies, Date createdAt, int __v) {
         this._id = _id;
         this.movieId = movieId;
@@ -29,7 +28,6 @@ public class Review {
         this.__v = __v;
     }
 
-    // Getters and setters
     public String getId() {
         return _id;
     }

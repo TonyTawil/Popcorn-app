@@ -137,7 +137,6 @@ public class SignUpActivity extends AppCompatActivity {
                 return true;
             }
 
-            // If none of the IDs match, you can handle it here or just ignore.
             return false;
         });
     }

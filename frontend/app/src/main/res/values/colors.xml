@@ -2,8 +2,8 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="colorPrimary">#D84315</color> <!-- deep orange -->
-    <color name="colorPrimaryDark">#BF360C</color> <!-- dark shade of the deep orange -->
+    <color name="colorPrimary">#D84315</color>
+    <color name="colorPrimaryDark">#BF360C</color>
     <color name="colorAccent">#FFC107</color>
 
 </resources>

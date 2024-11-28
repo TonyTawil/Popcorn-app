@@ -7,13 +7,11 @@ public class WatchedAddResponse {
     private String message;
     private List<Movie> watchedList;
 
-    // Constructor
     public WatchedAddResponse(String message, List<Movie> watchedList) {
         this.message = message;
         this.watchedList = watchedList;
     }
 
-    // Getters
     public String getMessage() {
         return message;
     }
@@ -22,7 +20,6 @@ public class WatchedAddResponse {
         return watchedList;
     }
 
-    // Setters
     public void setMessage(String message) {
         this.message = message;
     }

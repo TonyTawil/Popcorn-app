@@ -23,8 +23,8 @@ public class FetchMoviesTask extends AsyncTask<Void, Void, List<Movie>> {
     private static final String TAG = "FetchMoviesTask";
     private RecyclerView recyclerView;
     private int page;
-    private int itemsPerPage;  // Number of items to display
-    private String movieType;  // "trending" or "now_playing"
+    private int itemsPerPage;
+    private String movieType;
 
     public FetchMoviesTask(RecyclerView recyclerView, int page, int itemsPerPage, String movieType) {
         this.recyclerView = recyclerView;

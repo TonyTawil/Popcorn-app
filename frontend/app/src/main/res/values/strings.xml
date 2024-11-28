@@ -2,7 +2,6 @@
     <string name="app_name">Popcorn</string>
         <string name="navigation_drawer_open">Open navigation drawer</string>
         <string name="navigation_drawer_close">Close navigation drawer</string>
-    <!-- strings.xml -->
     <string name="gender_prompt">Select your gender</string>
     <string-array name="gender_options">
         <item>male</item>

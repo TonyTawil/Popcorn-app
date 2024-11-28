@@ -4,13 +4,11 @@ public class WatchedRemoveRequest {
     private String userId;
     private int movieId;
 
-    // Constructor
     public WatchedRemoveRequest(String userId, int movieId) {
         this.userId = userId;
         this.movieId = movieId;
     }
 
-    // Getters and Setters
     public String getUserId() {
         return userId;
     }

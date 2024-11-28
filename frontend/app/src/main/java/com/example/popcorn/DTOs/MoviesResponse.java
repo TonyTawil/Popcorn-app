@@ -9,7 +9,6 @@ public class MoviesResponse {
     private int total_pages;
     private int total_results;
 
-    // Getters and setters
     public int getPage() {
         return page;
     }

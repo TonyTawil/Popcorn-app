@@ -30,7 +30,6 @@ public class MovieResponse {
     private double voteAverage;
     private int voteCount;
 
-    // Getters and setters for all fields
     public boolean isAdult() { return adult; }
     public void setAdult(boolean adult) { this.adult = adult; }
 
@@ -109,7 +108,6 @@ public class MovieResponse {
     public int getVoteCount() { return voteCount; }
     public void setVoteCount(int voteCount) { this.voteCount = voteCount; }
 
-    // Nested Classes with their Getters and Setters
     public static class Genre {
         private int id;
         private String name;

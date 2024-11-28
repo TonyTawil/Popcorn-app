@@ -12,7 +12,6 @@ public class Movie {
     private List<Person> cast;
     private List<Person> crew;
 
-    // Base URL for movie posters
     private static final String BASE_IMAGE_URL = "https://image.tmdb.org/t/p/w500";
 
     public Movie(int id, String title, String poster_path, String plot, List<Person> cast, List<Person> crew) {
@@ -38,7 +37,7 @@ public class Movie {
         if (poster_path != null && !poster_path.isEmpty()) {
             this.poster_path = BASE_IMAGE_URL + poster_path;
         } else {
-            this.poster_path = null; // Handle null or empty paths appropriately
+            this.poster_path = null;
         }
     }
 

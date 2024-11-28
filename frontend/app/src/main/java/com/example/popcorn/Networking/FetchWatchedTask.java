@@ -61,15 +61,11 @@ public class FetchWatchedTask {
         List<Movie> movies = new ArrayList<>();
         for (WatchedResponse.Movie watchedMovie : watchedMovies) {
             Movie movie = new Movie(watchedMovie.getMovieId(), watchedMovie.getTitle(), "https://image.tmdb.org/t/p/w500" + watchedMovie.getCoverImage(), "", new ArrayList<>(), new ArrayList<>());
-            fetchCredits(movie);
             movies.add(movie);
         }
         return movies;
     }
 
-    private void fetchCredits(Movie movie) {
-        // Implementation for fetching cast and crew should be added here.
-    }
 
     public void removeMovieFromWatched(String userId, int movieId, Runnable onSuccess) {
         ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
@@ -80,7 +76,7 @@ public class FetchWatchedTask {
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(context, "Movie removed from watched list", Toast.LENGTH_SHORT).show();
-                    onSuccess.run(); // Callback to handle UI update
+                    onSuccess.run();
                 } else {
                     Toast.makeText(context, "Failed to remove movie", Toast.LENGTH_SHORT).show();
                 }

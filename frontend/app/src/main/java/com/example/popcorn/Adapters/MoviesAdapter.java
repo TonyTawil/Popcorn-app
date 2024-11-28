@@ -25,7 +25,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
     private Context context;
     private List<Movie> movieList;
     private boolean showDeleteIcon;
-    private String listType; // "watchlist" or "watched"
+    private String listType;
     private FetchWatchlistTask fetchWatchlistTask;
     private FetchWatchedTask fetchWatchedTask;
 
@@ -55,11 +55,10 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
             posterPath = "https://image.tmdb.org/t/p/w500" + posterPath;
         }
 
-        // Load the image using Glide with error handling
         Glide.with(context)
                 .load(posterPath)
-                .placeholder(R.drawable.placeholder) // Assuming 'placeholder' is a valid drawable resource ID
-                .error(R.drawable.movie) // Assuming 'error_image' is a valid drawable resource ID
+                .placeholder(R.drawable.placeholder)
+                .error(R.drawable.movie)
                 .into(holder.posterImageView);
 
         holder.itemView.setOnClickListener(v -> {
@@ -71,7 +70,6 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
             intent.putExtra("posterPath", movie.getPosterPath());
             intent.putExtra("plot", movie.getPlot());
 
-            // Proper null checks before putting them into the intent
             intent.putParcelableArrayListExtra("cast", movie.getCast() != null ? new ArrayList<>(movie.getCast()) : new ArrayList<>());
             intent.putParcelableArrayListExtra("crew", movie.getCrew() != null ? new ArrayList<>(movie.getCrew()) : new ArrayList<>());
 
@@ -118,13 +116,13 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
     public static class MovieViewHolder extends RecyclerView.ViewHolder {
         TextView titleTextView;
         ImageView posterImageView;
-        ImageView removeIcon; // Icon for removing a movie from the lists
+        ImageView removeIcon;
 
         public MovieViewHolder(View itemView) {
             super(itemView);
             titleTextView = itemView.findViewById(R.id.titleTextView);
             posterImageView = itemView.findViewById(R.id.posterImageView);
-            removeIcon = itemView.findViewById(R.id.remove_icon); // Reference to the delete icon in the layout
+            removeIcon = itemView.findViewById(R.id.remove_icon);
         }
     }
 }

@@ -46,7 +46,6 @@ public class VerificationActivity extends AppCompatActivity {
 
         toggle.getDrawerArrowDrawable().setColor(getResources().getColor(android.R.color.white));
 
-        // Retrieve userId from SharedPreferences
         SharedPreferences prefs = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         userId = prefs.getString("userId", null);
 
@@ -69,7 +68,6 @@ public class VerificationActivity extends AppCompatActivity {
                 return true;
             }
 
-            // If none of the IDs match, you can handle it here or just ignore.
             return false;
         });
     }

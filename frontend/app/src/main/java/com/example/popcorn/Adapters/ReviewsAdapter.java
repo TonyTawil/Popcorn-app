@@ -32,8 +32,8 @@ import retrofit2.Response;
 
 public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ReviewViewHolder> {
     private List<Review> reviewsList;
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()); // For date formatting
-    private String currentUserId;  // ID of the logged-in user
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
+    private String currentUserId;
     private Context context;
 
     public ReviewsAdapter(List<Review> reviewsList, Context context) {

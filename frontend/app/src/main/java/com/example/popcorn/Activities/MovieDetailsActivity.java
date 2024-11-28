@@ -118,7 +118,6 @@ public class MovieDetailsActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     MovieResponse movie = response.body();
 
-                    // Log the complete movie response
                     Log.d("MovieDetailsActivity", "Movie Response: " + movie.toString());
 
                     ImageView moviePosterImageView = findViewById(R.id.moviePosterImageView);
@@ -128,16 +127,13 @@ public class MovieDetailsActivity extends AppCompatActivity {
                     movieTitleTextView.setText(movie.getTitle());
                     moviePlotTextView.setText(movie.getOverview());
 
-                    // Check if the poster path is not null and prepend the base URL if it's not already included
                     String posterPath = movie.getPosterPath();
                     if (posterPath != null && !posterPath.startsWith("http")) {
                         posterPath = "https://image.tmdb.org/t/p/w500" + posterPath;
                     }
 
-                    // Log the final poster path to help with debugging
                     Log.d("MovieDetailsActivity", "Poster Path: " + posterPath);
 
-                    // Use Glide to load the poster image
                     Glide.with(MovieDetailsActivity.this).load(posterPath).into(moviePosterImageView);
                 } else {
                     Toast.makeText(MovieDetailsActivity.this, "Failed to load movie details", Toast.LENGTH_SHORT).show();
@@ -153,8 +149,6 @@ public class MovieDetailsActivity extends AppCompatActivity {
     }
 
 
-
-    // Add this method to MovieDetailsActivity
     private void initRecyclerViews() {
         castRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         crewRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
@@ -279,7 +273,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     Toast.makeText(MovieDetailsActivity.this, "Added to watched list", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(MovieDetailsActivity.this, "Failed to add to watched list: " + response.code(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MovieDetailsActivity.this, "Movie already marked as watched", Toast.LENGTH_SHORT).show();
                 }
             }
 

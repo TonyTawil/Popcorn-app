@@ -13,7 +13,7 @@ public class RetrofitClient {
             OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 
             retrofit = new Retrofit.Builder()
-                    .baseUrl("http://10.0.2.2:5000/")  // Replace with your API base URL
+                    .baseUrl("https://popcorn-4gmf.onrender.com/")
                     .addConverterFactory(GsonConverterFactory.create())
                     .client(httpClient.build())
                     .build();

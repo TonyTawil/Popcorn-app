@@ -9,7 +9,6 @@ public class User {
     String confirmPassword;
     String gender;
 
-    // Constructor updated to include firstName and lastName
     public User(String firstName, String lastName, String username, String email, String password, String confirmPassword, String gender) {
         this.firstName = firstName;
         this.lastName = lastName;
@@ -20,5 +19,4 @@ public class User {
         this.gender = gender;
     }
 
-    // Getters and Setters (if needed) can be added here to manage the properties
 }

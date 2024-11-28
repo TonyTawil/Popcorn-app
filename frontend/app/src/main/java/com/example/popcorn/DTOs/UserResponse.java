@@ -8,7 +8,6 @@ public class UserResponse {
     private String email;
     private String gender;
 
-    // Constructor
     public UserResponse(String _id, String firstName, String lastName, String username, String email, String gender) {
         this._id = _id;
         this.firstName = firstName;

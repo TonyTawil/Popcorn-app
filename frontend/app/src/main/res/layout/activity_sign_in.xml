@@ -126,7 +126,7 @@
         android:backgroundTint="@color/colorPrimary"
         app:headerLayout="@layout/nav_header"
         app:menu="@menu/drawer_menu"
-        app:itemTextColor="@color/color_state_list" /> <!-- Apply the custom color state list here -->
+        app:itemTextColor="@color/color_state_list" />
 
 
 </androidx.drawerlayout.widget.DrawerLayout>

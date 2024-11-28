@@ -8,6 +8,6 @@
         android:id="@+id/toolbar_logo"
         android:layout_width="180dp"
         android:layout_height="wrap_content"
-        android:src="@drawable/logo" />  <!-- Ensure your logo drawable is here -->
+        android:src="@drawable/logo" />
 
 </FrameLayout>

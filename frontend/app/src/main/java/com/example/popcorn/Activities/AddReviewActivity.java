@@ -35,7 +35,7 @@ public class AddReviewActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private NavigationManager navigationManager;
 
-    private RatingBar ratingBar; // Add this line at the beginning of your class with other field declarations.
+    private RatingBar ratingBar;
 
 
     @Override
@@ -118,21 +118,14 @@ public class AddReviewActivity extends AppCompatActivity {
                 if (response.isSuccessful()) {
                     Toast.makeText(AddReviewActivity.this, "Review submitted!", Toast.LENGTH_SHORT).show();
 
-                    // Redirect to ReviewsActivity to see all reviews for the movie
+
                     Intent intent = new Intent(AddReviewActivity.this, ReviewsActivity.class);
-                    intent.putExtra("movieId", movieId); // Ensure ReviewsActivity is expecting this extra
+                    intent.putExtra("movieId", movieId);
                     startActivity(intent);
                     finish();
 
                 } else {
-                    String errorMessage = "Failed to submit review. Status code: " + response.code();
-                    try {
-                        if (response.errorBody() != null) {
-                            errorMessage += ", Error: " + response.errorBody().string();
-                        }
-                    } catch (IOException e) {
-                        Log.e("AddReviewActivity", "Error reading error message", e);
-                    }
+                    String errorMessage = "You've already reviewed this movie";
                     Toast.makeText(AddReviewActivity.this, errorMessage, Toast.LENGTH_LONG).show();
                 }
             }

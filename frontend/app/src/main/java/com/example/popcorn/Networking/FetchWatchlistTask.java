@@ -61,18 +61,11 @@ public class FetchWatchlistTask {
         List<Movie> movies = new ArrayList<>();
         for (WatchlistResponse.Movie watchMovie : watchListMovies) {
             Movie movie = new Movie(watchMovie.getMovieId(), watchMovie.getTitle(), "https://image.tmdb.org/t/p/w500" + watchMovie.getCoverImage(), "", new ArrayList<>(), new ArrayList<>());
-            fetchCredits(movie);
             movies.add(movie);
         }
         return movies;
     }
 
-    private void fetchCredits(Movie movie) {
-        // Here, you will need to implement actual fetching of cast and crew from your backend or external API.
-        // This is a placeholder for the network call to fetch cast and crew.
-        // Assume you have a method similar to fetchMovies that also retrieves cast and crew for a given movie ID.
-        // The implementation depends on your actual API specifications.
-    }
 
     public void removeMovieFromWatchlist(String userId, int movieId, Runnable onSuccess) {
         ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
@@ -83,7 +76,7 @@ public class FetchWatchlistTask {
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(context, "Movie removed from watchlist", Toast.LENGTH_SHORT).show();
-                    onSuccess.run(); // Callback to handle UI update
+                    onSuccess.run();
                 } else {
                     Toast.makeText(context, "Failed to remove movie", Toast.LENGTH_SHORT).show();
                 }

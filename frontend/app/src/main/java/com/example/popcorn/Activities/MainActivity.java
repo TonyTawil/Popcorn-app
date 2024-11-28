@@ -30,22 +30,20 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.appBarLayout);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false); // Ensures title is not displayed
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         drawerLayout = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationManager = new NavigationManager(this, navigationView, drawerLayout);
         navigationManager.updateDrawerContents();
 
-        // Initialize ActionBarDrawerToggle
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+               ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawerLayout, toolbar,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
         toggle.getDrawerArrowDrawable().setColor(getResources().getColor(android.R.color.white));
-        // Setup RecyclerViews and Buttons
         setupRecyclerViews();
 
         showMoreButton.setOnClickListener(v -> startActivity(new Intent(MainActivity.this, PopularListActivity.class)));
@@ -63,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
                 drawerLayout.closeDrawer(GravityCompat.START);
                 return true;
-            } else if (id == R.id.nav_watched) {  // Check if the 'Watched' menu item is clicked
+            } else if (id == R.id.nav_watched) {
                 Intent intent = new Intent(this, WatchedActivity.class);
                 startActivity(intent);
                 drawerLayout.closeDrawer(GravityCompat.START);

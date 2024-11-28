@@ -6,7 +6,6 @@ public class WatchlistAddRequest {
     private String title;
     private String coverImage;
 
-    // Constructor
     public WatchlistAddRequest(String userId, int movieId, String title, String coverImage) {
         this.userId = userId;
         this.movieId = movieId;
@@ -14,7 +13,6 @@ public class WatchlistAddRequest {
         this.coverImage = coverImage;
     }
 
-    // Getters
     public String getUserId() {
         return userId;
     }
@@ -31,7 +29,6 @@ public class WatchlistAddRequest {
         return coverImage;
     }
 
-    // Setters
     public void setUserId(String userId) {
         this.userId = userId;
     }

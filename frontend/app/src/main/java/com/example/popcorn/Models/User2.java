@@ -4,13 +4,11 @@ public class User2 {
     private String _id;
     private String username;
 
-    // Constructor
     public User2(String _id, String username) {
         this._id = _id;
         this.username = username;
     }
 
-    // Getters and setters
     public String getId() {
         return _id;
     }

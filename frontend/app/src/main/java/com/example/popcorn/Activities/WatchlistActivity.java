@@ -62,7 +62,7 @@ public class WatchlistActivity extends AppCompatActivity {
                 startActivity(intent);
                 drawerLayout.closeDrawer(GravityCompat.START);
                 return true;
-            } else if (id == R.id.nav_watched) {  // Check if the 'Watched' menu item is clicked
+            } else if (id == R.id.nav_watched) {
                 Intent intent = new Intent(this, WatchedActivity.class);
                 startActivity(intent);
                 drawerLayout.closeDrawer(GravityCompat.START);

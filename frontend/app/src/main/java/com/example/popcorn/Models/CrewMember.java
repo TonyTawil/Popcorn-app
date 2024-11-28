@@ -17,6 +17,6 @@ public class CrewMember {
         if (profile_path != null && !profile_path.isEmpty()) {
             return "https://image.tmdb.org/t/p/w500" + profile_path;
         }
-        return null; // or return a default image path
+        return null;
     }
 }

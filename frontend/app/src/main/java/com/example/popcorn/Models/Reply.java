@@ -7,11 +7,10 @@ public class Reply {
     private String _id;
     private String userId;
     private String replyText;
-    private List<String> likes;  // Assuming likes are stored as a list of user IDs who liked the reply
+    private List<String> likes;
     private int likesCount;
     private Date createdAt;
 
-    // Constructor
     public Reply(String _id, String userId, String replyText, List<String> likes, int likesCount, Date createdAt) {
         this._id = _id;
         this.userId = userId;
@@ -21,7 +20,6 @@ public class Reply {
         this.createdAt = createdAt;
     }
 
-    // Getters and Setters
     public String getId() {
         return _id;
     }

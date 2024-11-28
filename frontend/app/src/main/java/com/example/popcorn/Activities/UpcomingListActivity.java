@@ -31,16 +31,14 @@ public class UpcomingListActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.appBarLayout);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false); // Ensures title is not displayed
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         drawerLayout = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
 
-        // Initialize NavigationManager
         navigationManager = new NavigationManager(this, navigationView, drawerLayout);
         navigationManager.updateDrawerContents();
 
-        // Initialize ActionBarDrawerToggle
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawerLayout, toolbar,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -55,7 +53,7 @@ public class UpcomingListActivity extends AppCompatActivity {
         btnNext = findViewById(R.id.btnNext);
         btnPrevious = findViewById(R.id.btnPrevious);
 
-        btnPrevious.setEnabled(false); // Initially disable 'Previous' button
+        btnPrevious.setEnabled(false);
 
         loadMovies(currentPage);
 
@@ -84,7 +82,7 @@ public class UpcomingListActivity extends AppCompatActivity {
                 startActivity(intent);
                 drawerLayout.closeDrawer(GravityCompat.START);
                 return true;
-            } else if (id == R.id.nav_watched) {  // Check if the 'Watched' menu item is clicked
+            } else if (id == R.id.nav_watched) {
                 Intent intent = new Intent(this, WatchedActivity.class);
                 startActivity(intent);
                 drawerLayout.closeDrawer(GravityCompat.START);
