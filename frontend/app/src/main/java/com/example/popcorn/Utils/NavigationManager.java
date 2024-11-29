@@ -59,18 +59,5 @@ public class NavigationManager {
             });
         }
     }
-
-    public void logout() {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.clear();
-        editor.apply();
-        Log.d("NavigationManager", "User logged out, shared preferences cleared.");
-        updateDrawerContents(); // Refresh the drawer menu
-        Intent intent = new Intent(context, SignInActivity.class);
-        context.startActivity(intent);
-        if (context instanceof MainActivity) {
-            ((MainActivity) context).finish();
-        }
-    }
 }
 

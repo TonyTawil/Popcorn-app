@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.popcorn.Networking.FetchWatchlistTask;
 import com.example.popcorn.R;
+import com.example.popcorn.Utils.LogoutManager;
 import com.example.popcorn.Utils.NavigationManager;
 import com.google.android.material.navigation.NavigationView;
 
@@ -68,7 +69,8 @@ public class WatchlistActivity extends AppCompatActivity {
                 drawerLayout.closeDrawer(GravityCompat.START);
                 return true;
             } else if (id == R.id.nav_logout) {
-                navigationManager.logout();
+                LogoutManager.logout(this);
+                drawerLayout.closeDrawer(GravityCompat.START);
                 return true;
             }
             return false;

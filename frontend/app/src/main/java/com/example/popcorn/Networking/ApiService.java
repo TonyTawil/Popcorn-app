@@ -92,4 +92,7 @@ public interface ApiService {
     @GET("api/tmdb/{type}")
     Call<MoviesResponse> getMoviesByType(@Path("type") String type, @Query("page") int page);
 
+    @POST("api/auth/logout")
+    Call<Void> logoutUser();
+
 }

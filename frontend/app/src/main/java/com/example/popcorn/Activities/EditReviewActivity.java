@@ -19,6 +19,7 @@ import com.example.popcorn.DTOs.ReviewResponse;
 import com.example.popcorn.Networking.ApiService;
 import com.example.popcorn.Networking.RetrofitClient;
 import com.example.popcorn.R;
+import com.example.popcorn.Utils.LogoutManager;
 import com.example.popcorn.Utils.NavigationManager;
 import com.google.android.material.navigation.NavigationView;
 import retrofit2.Call;
@@ -128,8 +129,9 @@ public class EditReviewActivity extends AppCompatActivity {
         } else if (id == R.id.nav_watched) {
             startActivity(new Intent(this, WatchedActivity.class));
         } else if (id == R.id.nav_logout) {
-            navigationManager.logout();
-            finish();
+            LogoutManager.logout(this);
+            drawerLayout.closeDrawer(GravityCompat.START);
+            return true;
         }
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;
