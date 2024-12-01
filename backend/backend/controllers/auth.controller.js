@@ -74,7 +74,11 @@ export const signup = async (req, res) => {
         profilePic: newUser.profilePic,
       });
 
-      const verificationUrl = `http://localhost:5000/api/auth/verify-email?token=${token}`;
+      const verificationUrl =
+        process.env.NODE_ENV === "production"
+          ? `https://https://popcorn-4gmf.onrender.com:5000/api/auth/verify-email?token=${token}`
+          : `http://localhost:5000/api/auth/verify-email?token=${token}`;
+
       sendVerificationEmail(newUser.email, verificationUrl);
     } else {
       res.status(400).json({ error: "Invalid user data" });
