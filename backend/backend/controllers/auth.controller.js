@@ -76,7 +76,7 @@ export const signup = async (req, res) => {
 
       const verificationUrl =
         process.env.NODE_ENV === "production"
-          ? `https://https://popcorn-4gmf.onrender.com:5000/api/auth/verify-email?token=${token}`
+          ? `https://https://popcorn-4gmf.onrender.com/api/auth/verify-email?token=${token}`
           : `http://localhost:5000/api/auth/verify-email?token=${token}`;
 
       sendVerificationEmail(newUser.email, verificationUrl);
