@@ -39,7 +39,7 @@ public class LogoutManager {
     }
 
     private static void clearLocalData(Context context) {
-        SharedPreferences preferences = context.getSharedPreferences("YourAppPreference", Context.MODE_PRIVATE);
+        SharedPreferences preferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.clear();
         editor.apply();
