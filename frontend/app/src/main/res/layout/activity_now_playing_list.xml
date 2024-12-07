@@ -65,6 +65,7 @@
                 android:id="@+id/btnPrevious"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
                 android:backgroundTint="@color/colorPrimary"
                 android:text="Previous"/>
 
