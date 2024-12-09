@@ -4,10 +4,11 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp-relay.brevo.com",
+  port: 587,
   auth: {
-    user: process.env.GMAIL_APP_EMAIL,
-    pass: process.env.GMAIL_APP_PASSWORD,
+    user: process.env.BREVO_APP_EMAIL,
+    pass: process.env.BREVO_APP_PASSWORD,
   },
 });
 
