@@ -18,7 +18,8 @@
 
         <activity
             android:name=".Activities.MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:configChanges="uiMode|screenSize|orientation">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -27,52 +28,64 @@
 
         <activity
             android:name=".Activities.MovieDetailsActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:configChanges="uiMode|screenSize|orientation"/>
 
         <activity
             android:name=".Activities.PopularListActivity"
-            android:exported="true"/>
+            android:exported="true"
+            android:configChanges="uiMode|screenSize|orientation"/>
 
         <activity
             android:name=".Activities.NowPlayingListActivity"
-            android:exported="true"/>
+            android:exported="true"
+            android:configChanges="uiMode|screenSize|orientation"/>
 
         <activity
             android:name=".Activities.UpcomingListActivity"
-            android:exported="true"/>
+            android:exported="true"
+            android:configChanges="uiMode|screenSize|orientation"/>
 
         <!-- Declaration of SignUpActivity -->
         <activity
             android:name=".Activities.SignUpActivity"
-            android:exported="true"/>
+            android:exported="true"
+            android:configChanges="uiMode|screenSize|orientation"/>
 
         <activity
             android:name=".Activities.SignInActivity"
-            android:exported="true"/>
+            android:exported="true"
+            android:configChanges="uiMode|screenSize|orientation" />
 
         <activity
             android:name=".Activities.VerificationActivity"
-            android:exported="true"/>
+            android:exported="true"
+            android:configChanges="uiMode|screenSize|orientation"/>
 
         <activity
             android:name=".Activities.WatchlistActivity"
-            android:exported="true"/>
+            android:exported="true"
+            android:configChanges="uiMode|screenSize|orientation"/>
 
         <activity
             android:name=".Activities.WatchedActivity"
-            android:exported="true"/>
+            android:exported="true"
+            android:configChanges="uiMode|screenSize|orientation"/>
 
         <activity
             android:name=".Activities.AddReviewActivity"
-            android:exported="true"/>
+            android:exported="true"
+            android:configChanges="uiMode|screenSize|orientation"/>
 
         <activity
             android:name=".Activities.ReviewsActivity"
-            android:exported="true"/>
+            android:exported="true"
+            android:configChanges="uiMode|screenSize|orientation"/>
 
         <activity
             android:name=".Activities.EditReviewActivity"
-            android:exported="true"/>
+            android:exported="true"
+            android:configChanges="uiMode|screenSize|orientation"/>
 
     </application>
 </manifest>

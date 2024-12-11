@@ -13,4 +13,9 @@
         <item name="elevation">4dp</item>
     </style>
 
+    <style name="Base.Theme.Popcorn" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:statusBarColor">#BF360C</item>
+    </style>
+    <style name="Theme.Popcorn" parent="Base.Theme.Popcorn" />
+
 </resources>

@@ -24,7 +24,7 @@
             <com.google.android.material.appbar.AppBarLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:theme="@style/AppTheme.AppBarOverlay">
+                android:theme="@style/Base.Theme.Popcorn">
 
                 <androidx.appcompat.widget.Toolbar
                     android:id="@+id/appBarLayout"
@@ -86,6 +86,7 @@
                 android:id="@+id/signInButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/white"
                 android:layout_marginTop="16dp"
                 android:layout_gravity="center"
                 android:text="Sign In"

@@ -16,7 +16,7 @@
             android:id="@+id/appBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:theme="@style/AppTheme.AppBarOverlay"
+            android:theme="@style/Base.Theme.Popcorn"
             app:layout_constraintTop_toTopOf="parent">
 
             <androidx.appcompat.widget.Toolbar
@@ -65,12 +65,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Previous"
+                android:textColor="@color/white"
                 android:layout_marginEnd="10dp"
                 android:backgroundTint="@color/colorPrimary"/>
 
             <Button
                 android:id="@+id/btnNext"
                 android:layout_width="wrap_content"
+                android:textColor="@color/white"
                 android:layout_height="wrap_content"
                 android:text="Next"
                 android:backgroundTint="@color/colorPrimary"/>

@@ -22,7 +22,7 @@
             <com.google.android.material.appbar.AppBarLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:theme="@style/AppTheme.AppBarOverlay">
+                android:theme="@style/Base.Theme.Popcorn">
 
                 <androidx.appcompat.widget.Toolbar
                     android:id="@+id/appBarLayout"
@@ -64,6 +64,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="I Verified"
+                android:textColor="@color/white"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="32dp"
                 android:backgroundTint="@color/colorPrimary"/>

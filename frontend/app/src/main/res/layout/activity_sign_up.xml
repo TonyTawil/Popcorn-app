@@ -24,7 +24,7 @@
             <com.google.android.material.appbar.AppBarLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:theme="@style/AppTheme.AppBarOverlay">
+                android:theme="@style/Base.Theme.Popcorn">
 
                 <androidx.appcompat.widget.Toolbar
                     android:id="@+id/appBarLayout"
@@ -162,6 +162,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:layout_gravity="center"
+                android:textColor="@color/white"
                 android:text="Sign Up"
                 android:backgroundTint="@color/colorPrimary"/>
 

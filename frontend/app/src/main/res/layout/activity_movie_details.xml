@@ -20,7 +20,7 @@
                 android:id="@+id/appBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:theme="@style/AppTheme.AppBarOverlay"
+                android:theme="@style/Base.Theme.Popcorn"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <androidx.appcompat.widget.Toolbar
@@ -58,6 +58,7 @@
                 android:id="@+id/addToWatchlistButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/white"
                 android:text="Add to Watchlist"
                 android:backgroundTint="@color/colorPrimary"
                 app:layout_constraintTop_toBottomOf="@id/movieTitleTextView"
@@ -69,6 +70,7 @@
                 android:id="@+id/markAsWatchedButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/white"
                 android:backgroundTint="@color/colorPrimary"
                 android:text="Mark as Watched"
                 app:layout_constraintTop_toBottomOf="@id/addToWatchlistButton"
@@ -81,6 +83,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Add Review"
+                android:textColor="@color/white"
                 android:backgroundTint="@color/colorPrimary"
                 app:layout_constraintTop_toBottomOf="@id/markAsWatchedButton"
                 app:layout_constraintStart_toStartOf="parent"
@@ -92,6 +95,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="View All Reviews"
+                android:textColor="@color/white"
                 android:backgroundTint="@color/colorPrimary"
                 app:layout_constraintTop_toBottomOf="@id/addReviewButton"
                 app:layout_constraintStart_toStartOf="parent"
