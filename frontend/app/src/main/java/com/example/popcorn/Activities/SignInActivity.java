@@ -66,7 +66,7 @@ public class SignInActivity extends AppCompatActivity {
         String username = usernameEditText.getText().toString().trim();
         String password = passwordEditText.getText().toString().trim();
 
-        ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
+        ApiService apiService = RetrofitClient.getRetrofitInstance(this).create(ApiService.class);
         Call<UserResponse> call = apiService.loginUser(new LoginUser(username, password));
         call.enqueue(new Callback<UserResponse>() {
             @Override

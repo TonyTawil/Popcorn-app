@@ -99,6 +99,6 @@ public class UpcomingListActivity extends AppCompatActivity {
     }
 
     private void loadMovies(int page) {
-        new FetchMoviesTask(moviesRecyclerView, page, 5, "upcoming").execute();
+        new FetchMoviesTask(moviesRecyclerView, page, 5, "upcoming", this).execute();
     }
 }

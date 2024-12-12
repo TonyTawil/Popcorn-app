@@ -72,7 +72,7 @@ public class ReviewsActivity extends AppCompatActivity {
     }
 
     private void loadReviews() {
-        ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
+        ApiService apiService = RetrofitClient.getRetrofitInstance(this).create(ApiService.class);
         Call<List<Review>> call = apiService.getReviewsByMovieId(movieId);
         call.enqueue(new Callback<List<Review>>() {
             @Override

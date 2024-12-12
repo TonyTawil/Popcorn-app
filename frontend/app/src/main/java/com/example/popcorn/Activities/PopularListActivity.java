@@ -97,7 +97,7 @@ public class PopularListActivity extends AppCompatActivity {
     }
 
     private void loadMovies(int page, String category) {
-        new FetchMoviesTask(moviesRecyclerView, page, 5, category).execute();
+        new FetchMoviesTask(moviesRecyclerView, page, 5, category, this).execute();
     }
 
     private void updateButtons() {

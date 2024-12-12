@@ -97,7 +97,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
     }
 
     private void fetchSimilarMovies() {
-        new FetchSimilarMoviesTask(similarMoviesRecyclerView, movieId).execute();
+        new FetchSimilarMoviesTask(similarMoviesRecyclerView, movieId, this).execute();
     }
 
     private void setupDrawer(Toolbar toolbar) {
@@ -111,7 +111,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
     }
 
     private void displayMovieDetails() {
-        ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
+        ApiService apiService = RetrofitClient.getRetrofitInstance(this).create(ApiService.class);
         Call<MovieResponse> call = apiService.getMovieDetails(movieId);
         call.enqueue(new Callback<MovieResponse>() {
             @Override
@@ -154,7 +154,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         castRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         crewRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
-        ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
+        ApiService apiService = RetrofitClient.getRetrofitInstance(this).create(ApiService.class);
         Call<CreditsResponse> call = apiService.fetchMovieCredits(movieId);
 
         call.enqueue(new Callback<CreditsResponse>() {
@@ -239,7 +239,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
             Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show();
             return;
         }
-        ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
+        ApiService apiService = RetrofitClient.getRetrofitInstance(this).create(ApiService.class);
         WatchlistAddRequest request = new WatchlistAddRequest(
                 userId, movieId, getIntent().getStringExtra("title"), getIntent().getStringExtra("posterPath"));
         apiService.addToWatchlist(request).enqueue(new Callback<WatchlistAddResponse>() {
@@ -267,7 +267,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
             Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show();
             return;
         }
-        ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
+        ApiService apiService = RetrofitClient.getRetrofitInstance(this).create(ApiService.class);
         WatchedAddRequest request = new WatchedAddRequest(userId, movieId, getIntent().getStringExtra("title"), getIntent().getStringExtra("posterPath"));
         apiService.addToWatched(request).enqueue(new Callback<WatchedAddResponse>() {
             @Override

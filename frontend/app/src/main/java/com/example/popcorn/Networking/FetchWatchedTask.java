@@ -31,7 +31,7 @@ public class FetchWatchedTask {
     }
 
     public void fetchWatched() {
-        ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
+        ApiService apiService = RetrofitClient.getRetrofitInstance(context).create(ApiService.class);
         WatchedRequest request = new WatchedRequest(userId);
         Call<WatchedResponse> call = apiService.fetchWatched(request);
 
@@ -68,7 +68,7 @@ public class FetchWatchedTask {
 
 
     public void removeMovieFromWatched(String userId, int movieId, Runnable onSuccess) {
-        ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
+        ApiService apiService = RetrofitClient.getRetrofitInstance(context).create(ApiService.class);
         Call<ResponseBody> call = apiService.removeFromWatched(new WatchedRemoveRequest(userId, movieId));
 
         call.enqueue(new Callback<ResponseBody>() {

@@ -31,7 +31,7 @@ public class FetchWatchlistTask {
     }
 
     public void fetchWatchlist() {
-        ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
+        ApiService apiService = RetrofitClient.getRetrofitInstance(context).create(ApiService.class);
         WatchlistRequest request = new WatchlistRequest(userId);
         Call<WatchlistResponse> call = apiService.fetchWatchlist(request);
 
@@ -68,7 +68,7 @@ public class FetchWatchlistTask {
 
 
     public void removeMovieFromWatchlist(String userId, int movieId, Runnable onSuccess) {
-        ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
+        ApiService apiService = RetrofitClient.getRetrofitInstance(context).create(ApiService.class);
         Call<ResponseBody> call = apiService.removeFromWatchlist(new WatchlistRemoveRequest(userId, movieId));
 
         call.enqueue(new Callback<ResponseBody>() {

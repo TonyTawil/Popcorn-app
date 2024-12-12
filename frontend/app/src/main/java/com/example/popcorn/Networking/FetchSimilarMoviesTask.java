@@ -1,9 +1,9 @@
 package com.example.popcorn.Networking;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
-
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.popcorn.Adapters.MoviesAdapter;
@@ -20,15 +20,17 @@ public class FetchSimilarMoviesTask extends AsyncTask<Void, Void, List<Movie>> {
     private static final String TAG = "FetchSimilarMoviesTask";
     private RecyclerView recyclerView;
     private int movieId;
+    private ApiService apiService;
 
-    public FetchSimilarMoviesTask(RecyclerView recyclerView, int movieId) {
+    public FetchSimilarMoviesTask(RecyclerView recyclerView, int movieId, Context context) {
         this.recyclerView = recyclerView;
         this.movieId = movieId;
+        // Utilizing the Retrofit client with caching
+        this.apiService = RetrofitClient.getRetrofitInstance(context).create(ApiService.class);
     }
 
     @Override
     protected List<Movie> doInBackground(Void... voids) {
-        ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
         Call<MoviesResponse> call = apiService.getSimilarMovies(movieId);
 
         try {
@@ -36,7 +38,7 @@ public class FetchSimilarMoviesTask extends AsyncTask<Void, Void, List<Movie>> {
             if (response.isSuccessful() && response.body() != null) {
                 return response.body().getResults();
             } else {
-                Log.e(TAG, "Error fetching similar movies: " + response.errorBody());
+                Log.e(TAG, "Error fetching similar movies: " + response.errorBody().string());
                 return new ArrayList<>();
             }
         } catch (Exception e) {
@@ -48,11 +50,9 @@ public class FetchSimilarMoviesTask extends AsyncTask<Void, Void, List<Movie>> {
     @Override
     protected void onPostExecute(List<Movie> movies) {
         if (movies != null && !movies.isEmpty()) {
-            recyclerView.setAdapter(new MoviesAdapter(recyclerView.getContext(), movies, false, "none"));
-
+            recyclerView.setAdapter(new MoviesAdapter(recyclerView.getContext(), movies, false, ""));
         } else {
             Toast.makeText(recyclerView.getContext(), "No similar movies found", Toast.LENGTH_LONG).show();
         }
     }
-
 }

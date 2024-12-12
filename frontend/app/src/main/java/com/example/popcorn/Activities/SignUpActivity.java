@@ -81,7 +81,7 @@ public class SignUpActivity extends AppCompatActivity {
             String gender = genderSpinner.getSelectedItem().toString();
 
             if (validatePassword(password, confirmPassword)) {
-                ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
+                ApiService apiService = RetrofitClient.getRetrofitInstance(this).create(ApiService.class);
                 User newUser = new User(firstName, lastName, username, email, password, confirmPassword, gender);
                 Call<UserResponse> call = apiService.createUser(newUser);
                 call.enqueue(new Callback<UserResponse>() {

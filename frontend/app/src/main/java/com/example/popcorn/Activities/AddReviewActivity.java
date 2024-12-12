@@ -112,7 +112,7 @@ public class AddReviewActivity extends AppCompatActivity {
         }
 
         ReviewRequest reviewRequest = new ReviewRequest(userId, movieId, rating, reviewText);
-        ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
+        ApiService apiService = RetrofitClient.getRetrofitInstance(this).create(ApiService.class);
         Call<ReviewResponse> call = apiService.addReview(reviewRequest);
         call.enqueue(new Callback<ReviewResponse>() {
             @Override

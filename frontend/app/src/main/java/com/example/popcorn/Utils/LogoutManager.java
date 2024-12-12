@@ -16,7 +16,8 @@ import retrofit2.Response;
 public class LogoutManager {
 
     public static void logout(final Context context) {
-        ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
+        // Utilizing the Retrofit client with caching by passing context
+        ApiService apiService = RetrofitClient.getRetrofitInstance(context).create(ApiService.class);
         Call<Void> call = apiService.logoutUser();
 
         call.enqueue(new Callback<Void>() {

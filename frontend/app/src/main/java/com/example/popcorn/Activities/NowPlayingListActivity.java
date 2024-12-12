@@ -99,6 +99,6 @@ public class NowPlayingListActivity extends AppCompatActivity {
     }
 
     private void loadMovies(int page) {
-        new FetchMoviesTask(moviesRecyclerView, page, 5, "now_playing").execute();
+        new FetchMoviesTask(moviesRecyclerView, page, 5, "now_playing",this).execute();
     }
 }

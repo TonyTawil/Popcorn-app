@@ -89,7 +89,7 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ReviewVi
         JsonObject userIdJson = new JsonObject();
         userIdJson.addProperty("userId", currentUserId);
 
-        ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
+        ApiService apiService = RetrofitClient.getRetrofitInstance(context).create(ApiService.class);
         Call<ResponseBody> call = apiService.deleteReview(reviewId, userIdJson);
         call.enqueue(new Callback<ResponseBody>() {
             @Override

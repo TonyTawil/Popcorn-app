@@ -1,5 +1,6 @@
 package com.example.popcorn.Networking;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
@@ -12,6 +13,7 @@ import com.example.popcorn.Models.CrewMember;
 import com.example.popcorn.Models.Movie;
 import com.example.popcorn.Models.Person;
 import com.example.popcorn.Adapters.MoviesAdapter;
+import com.example.popcorn.Utils.MemoryCache;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,28 +27,30 @@ public class FetchMoviesTask extends AsyncTask<Void, Void, List<Movie>> {
     private int page;
     private int itemsPerPage;
     private String movieType;
+    private ApiService apiService;
 
-    public FetchMoviesTask(RecyclerView recyclerView, int page, int itemsPerPage, String movieType) {
+    public FetchMoviesTask(RecyclerView recyclerView, int page, int itemsPerPage, String movieType, Context context) {
         this.recyclerView = recyclerView;
         this.page = page;
         this.itemsPerPage = itemsPerPage;
         this.movieType = movieType;
+        // Ensuring the ApiService instance is initialized here using the context.
+        this.apiService = RetrofitClient.getRetrofitInstance(context).create(ApiService.class);
     }
 
-    @Override
     protected List<Movie> doInBackground(Void... voids) {
-        ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
-        Call<MoviesResponse> call;
-        if ("trending".equals(movieType)) {
-            call = apiService.getTrendingMovies(page);
-        } else {
-            call = apiService.getMoviesByType(movieType, page);
+        String cacheKey = movieType + "_page_" + page;
+        if (MemoryCache.hasKey(cacheKey)) {
+            return MemoryCache.getMovies(cacheKey);
         }
 
+        Call<MoviesResponse> call = apiService.getMoviesByType(movieType, page);
         try {
             Response<MoviesResponse> response = call.execute();
             if (response.isSuccessful() && response.body() != null) {
-                return parseMoviesFromJson(response.body());
+                List<Movie> movies = parseMoviesFromJson(response.body());
+                MemoryCache.putMovies(cacheKey, movies);
+                return movies;
             } else {
                 Log.e(TAG, "Unsuccessful API Call: " + response.errorBody().string());
             }
@@ -73,7 +77,6 @@ public class FetchMoviesTask extends AsyncTask<Void, Void, List<Movie>> {
     }
 
     private List<Person> fetchCredits(int movieId, String type) {
-        ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
         Call<CreditsResponse> call = apiService.fetchMovieCredits(movieId);
 
         try {

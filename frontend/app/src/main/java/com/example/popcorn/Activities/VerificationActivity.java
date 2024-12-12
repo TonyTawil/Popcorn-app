@@ -78,7 +78,7 @@ public class VerificationActivity extends AppCompatActivity {
             return;
         }
 
-        ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
+        ApiService apiService = RetrofitClient.getRetrofitInstance(this).create(ApiService.class);
         Call<VerificationResponse> call = apiService.checkEmailVerified(userId);
         call.enqueue(new Callback<VerificationResponse>() {
             @Override
