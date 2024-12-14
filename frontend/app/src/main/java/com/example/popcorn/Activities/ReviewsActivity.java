@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.ImageView;
 import android.widget.Toast;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -66,6 +67,12 @@ public class ReviewsActivity extends AppCompatActivity {
         reviewsRecyclerView = findViewById(R.id.reviewsRecyclerView);
         reviewsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         loadReviews();
+
+        ImageView searchIcon = findViewById(R.id.search_icon);
+        searchIcon.setOnClickListener(view -> {
+            Intent intent2 = new Intent(this, SearchActivity.class);
+            startActivity(intent2);
+        });
 
         navigationManager.updateDrawerContents();
         navigationView.setNavigationItemSelectedListener(this::onNavigationItemSelected);

@@ -87,5 +87,10 @@
             android:exported="true"
             android:configChanges="uiMode|screenSize|orientation"/>
 
+        <activity
+            android:name=".Activities.SearchActivity"
+            android:exported="true"
+            android:configChanges="uiMode|screenSize|orientation"/>
+
     </application>
 </manifest>

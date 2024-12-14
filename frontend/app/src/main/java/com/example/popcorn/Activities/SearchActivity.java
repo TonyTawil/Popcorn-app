@@ -2,7 +2,6 @@ package com.example.popcorn.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Button;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -13,24 +12,26 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.popcorn.Networking.FetchMoviesTask;
+import com.example.popcorn.Adapters.MoviesAdapter;
+import com.example.popcorn.Models.Movie;
 import com.example.popcorn.R;
 import com.example.popcorn.Utils.LogoutManager;
 import com.example.popcorn.Utils.NavigationManager;
 import com.google.android.material.navigation.NavigationView;
 
-public class PopularListActivity extends AppCompatActivity {
+import java.util.ArrayList;
 
-    RecyclerView moviesRecyclerView;
-    Button btnNext, btnPrevious;
-    int currentPage = 1;
+public class SearchActivity extends AppCompatActivity {
+    private RecyclerView searchResultsRecyclerView;
+    private MoviesAdapter moviesAdapter;
+    private ArrayList<Movie> searchResults = new ArrayList<>();
     private DrawerLayout drawerLayout;
     private NavigationManager navigationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_popular_list);
+        setContentView(R.layout.activity_search);
 
         Toolbar toolbar = findViewById(R.id.appBarLayout);
         setSupportActionBar(toolbar);
@@ -49,28 +50,14 @@ public class PopularListActivity extends AppCompatActivity {
 
         toggle.getDrawerArrowDrawable().setColor(getResources().getColor(android.R.color.white));
 
-        moviesRecyclerView = findViewById(R.id.moviesRecyclerView);
-        moviesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        btnNext = findViewById(R.id.btnNext);
-        btnPrevious = findViewById(R.id.btnPrevious);
+        searchResultsRecyclerView = findViewById(R.id.searchResultsRecyclerView);
+        searchResultsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        loadMovies(currentPage, "popular");
-        updateButtons();
-
-        btnNext.setOnClickListener(v -> {
-            currentPage++;
-            loadMovies(currentPage, "popular");
-            updateButtons();
-        });
-
-        btnPrevious.setOnClickListener(v -> {
-            if (currentPage > 1) {
-                currentPage--;
-                loadMovies(currentPage, "popular");
-                updateButtons();
-            }
-        });
+        // Assuming you have a method to get search results:
+        // searchResults = getSearchResults();
+        moviesAdapter = new MoviesAdapter(this, searchResults, false, "");
+        searchResultsRecyclerView.setAdapter(moviesAdapter);
 
         navigationView.setNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
@@ -101,14 +88,5 @@ public class PopularListActivity extends AppCompatActivity {
             Intent intent = new Intent(this, SearchActivity.class);
             startActivity(intent);
         });
-
-    }
-
-    private void loadMovies(int page, String category) {
-        new FetchMoviesTask(moviesRecyclerView, page, 5, category, this).execute();
-    }
-
-    private void updateButtons() {
-        btnPrevious.setEnabled(currentPage > 1);
     }
 }

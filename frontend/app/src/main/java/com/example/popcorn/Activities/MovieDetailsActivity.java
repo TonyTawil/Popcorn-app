@@ -94,6 +94,12 @@ public class MovieDetailsActivity extends AppCompatActivity {
         viewReviewsButton.setOnClickListener(v -> openReviewsActivity());
 
         setupNavigationMenu(navigationView);
+
+        ImageView searchIcon = findViewById(R.id.search_icon);
+        searchIcon.setOnClickListener(view -> {
+            Intent intent = new Intent(this, SearchActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void fetchSimilarMovies() {

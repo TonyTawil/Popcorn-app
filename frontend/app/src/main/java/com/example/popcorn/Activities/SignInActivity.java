@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -58,6 +59,12 @@ public class SignInActivity extends AppCompatActivity {
 
         signInButton.setOnClickListener(v -> performLogin());
         signUpClickable.setOnClickListener(v -> navigateToSignUp());
+
+        ImageView searchIcon = findViewById(R.id.search_icon);
+        searchIcon.setOnClickListener(view -> {
+            Intent intent = new Intent(this, SearchActivity.class);
+            startActivity(intent);
+        });
 
         navigationView.setNavigationItemSelectedListener(item -> handleNavigationItemSelected(item));
     }

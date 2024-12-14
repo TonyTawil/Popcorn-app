@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.Toast;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -65,6 +66,12 @@ public class EditReviewActivity extends AppCompatActivity {
         navigationManager.updateDrawerContents();
         navigationView.setNavigationItemSelectedListener(this::onNavigationItemSelected);
         saveReviewButton.setOnClickListener(v -> submitReview());
+
+        ImageView searchIcon = findViewById(R.id.search_icon);
+        searchIcon.setOnClickListener(view -> {
+            Intent intent = new Intent(this, SearchActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void loadInitialData() {
