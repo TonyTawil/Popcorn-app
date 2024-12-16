@@ -16,7 +16,7 @@ async function sendVerificationEmail(email, verificationUrl) {
   const result = await transporter.sendMail({
     from: process.env.GMAIL_APP_EMAIL,
     to: email,
-    subject: "NameAnimalThing Account Verification Email",
+    subject: "Popcorn Account Verification Email",
     text: `Click the link below to verify your email address 
     ${verificationUrl}`,
   });
