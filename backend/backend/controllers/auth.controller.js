@@ -165,3 +165,24 @@ export const isEmailVerified = async (req, res) => {
     });
   }
 };
+
+export const getUserByEmail = async (req, res) => {
+  try {
+      const { email } = req.params;
+      const user = await User.findOne({ email });
+      if (user) {
+          res.json({
+              _id: user._id,
+              email: user.email,
+              firstName: user.firstName,
+              lastName: user.lastName,
+              username: user.username
+          });
+      } else {
+          res.status(404).json({ error: "User not found" });
+      }
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Server error" });
+  }
+};
