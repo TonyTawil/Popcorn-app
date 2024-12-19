@@ -77,3 +77,20 @@ export const getMovieById = async (req, res) => {
     });
   }
 };
+
+export const searchMovies = async (req, res) => {
+  const { query } = req.query;
+  try {
+    const response = await axios.get(
+      `https://api.themoviedb.org/3/search/movie?api_key=${
+        process.env.API_KEY
+      }&query=${encodeURIComponent(query)}`
+    );
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({
+      message: `Error searching for movies with query ${query}`,
+      error: error.message,
+    });
+  }
+};

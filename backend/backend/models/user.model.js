@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema(
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    gender: { type: String, required: true, enum: ["male", "female","other"] },
+    gender: { type: String, required: true, enum: ["male", "female", "other"] },
     profilePicture: { type: String, default: "" },
     isEmailVerified: { type: Boolean, default: false },
     emailVerificationToken: { type: String, required: false },
