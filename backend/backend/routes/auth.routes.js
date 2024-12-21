@@ -11,15 +11,10 @@ import {
 const router = express.Router();
 
 router.post("/signup", signup);
-
 router.post("/login", login);
-
 router.post("/logout", logout);
-
 router.get("/verify-email", verifyEmail);
-
 router.get("/is-verified/:userId", isEmailVerified);
-
 router.get("/user/email/:email", getUserByEmail);
 
 export default router;
