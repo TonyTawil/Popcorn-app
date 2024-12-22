@@ -20,6 +20,7 @@ const userSchema = new mongoose.Schema(
     profilePicture: { type: String, default: "" },
     isEmailVerified: { type: Boolean, default: false },
     emailVerificationToken: { type: String, required: false },
+    isGoogleAccount: { type: Boolean, default: false },
     watchList: [movieListSchema],
     watched: [movieListSchema],
   },

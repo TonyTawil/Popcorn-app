@@ -14,23 +14,26 @@ export const signup = async (req, res) => {
       password,
       confirmPassword,
       gender,
+      isGoogleAccount,
     } = req.body;
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({ error: "Invalid email format" });
-    }
+    if (!isGoogleAccount) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ error: "Invalid email format" });
+      }
 
-    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/; // Minimum eight characters, at least one letter and one number
-    if (!passwordRegex.test(password)) {
-      return res.status(400).json({
-        error:
-          "Password must be at least 8 characters long and contain both letters and numbers",
-      });
-    }
+      const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/; // Minimum eight characters, at least one letter and one number
+      if (!passwordRegex.test(password)) {
+        return res.status(400).json({
+          error:
+            "Password must be at least 8 characters long and contain both letters and numbers",
+        });
+      }
 
-    if (password !== confirmPassword) {
-      return res.status(400).json({ error: "Passwords do not match" });
+      if (password !== confirmPassword) {
+        return res.status(400).json({ error: "Passwords do not match" });
+      }
     }
 
     const userByUsername = await User.findOne({ username });
@@ -46,7 +49,13 @@ export const signup = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const token = generateEmailToken();
+    if (!isGoogleAccount) {
+      const token = generateEmailToken();
+      isVerified = false;
+    } else {
+      const token = null;
+      isVerified = true;
+    }
 
     const boyProfilePic = `https://avatar.iran.liara.run/public/boy?username=${username}`;
     const girlProfilePic = `https://avatar.iran.liara.run/public/girl?username=${username}`;
@@ -60,6 +69,8 @@ export const signup = async (req, res) => {
       gender,
       profilePic: gender == "male" ? boyProfilePic : girlProfilePic,
       emailVerificationToken: token,
+      isEmailVerified: isVerified,
+      isGoogleAccount,
     });
 
     if (newUser) {
@@ -74,12 +85,14 @@ export const signup = async (req, res) => {
         profilePic: newUser.profilePic,
       });
 
-      const verificationUrl =
-        process.env.NODE_ENV === "production"
-          ? `https://popcorn-4gmf.onrender.com/api/auth/verify-email?token=${token}`
-          : `http://localhost:5000/api/auth/verify-email?token=${token}`;
+      if (!isGoogleAccount) {
+        const verificationUrl =
+          process.env.NODE_ENV === "production"
+            ? `https://popcorn-4gmf.onrender.com/api/auth/verify-email?token=${token}`
+            : `http://localhost:5000/api/auth/verify-email?token=${token}`;
 
-      sendVerificationEmail(newUser.email, verificationUrl);
+        sendVerificationEmail(newUser.email, verificationUrl);
+      }
     } else {
       res.status(400).json({ error: "Invalid user data" });
     }
@@ -168,21 +181,21 @@ export const isEmailVerified = async (req, res) => {
 
 export const getUserByEmail = async (req, res) => {
   try {
-      const { email } = req.params;
-      const user = await User.findOne({ email });
-      if (user) {
-          res.json({
-              _id: user._id,
-              email: user.email,
-              firstName: user.firstName,
-              lastName: user.lastName,
-              username: user.username
-          });
-      } else {
-          res.status(404).json({ error: "User not found" });
-      }
+    const { email } = req.params;
+    const user = await User.findOne({ email });
+    if (user) {
+      res.json({
+        _id: user._id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        username: user.username,
+      });
+    } else {
+      res.status(404).json({ error: "User not found" });
+    }
   } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Server error" });
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
   }
 };
