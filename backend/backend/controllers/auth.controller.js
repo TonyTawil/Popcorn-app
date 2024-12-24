@@ -17,12 +17,12 @@ export const signup = async (req, res) => {
       isGoogleAccount,
     } = req.body;
 
-    if (!isGoogleAccount) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        return res.status(400).json({ error: "Invalid email format" });
-      }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: "Invalid email format" });
+    }
 
+    if (!isGoogleAccount) {
       const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/; // Minimum eight characters, at least one letter and one number
       if (!passwordRegex.test(password)) {
         return res.status(400).json({
@@ -30,7 +30,6 @@ export const signup = async (req, res) => {
             "Password must be at least 8 characters long and contain both letters and numbers",
         });
       }
-
       if (password !== confirmPassword) {
         return res.status(400).json({ error: "Passwords do not match" });
       }
@@ -46,19 +45,9 @@ export const signup = async (req, res) => {
       return res.status(400).json({ error: "Email is already in use" });
     }
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    if (!isGoogleAccount) {
-      const token = generateEmailToken();
-      isVerified = false;
-    } else {
-      const token = null;
-      isVerified = true;
-    }
-
-    const boyProfilePic = `https://avatar.iran.liara.run/public/boy?username=${username}`;
-    const girlProfilePic = `https://avatar.iran.liara.run/public/girl?username=${username}`;
+    const hashedPassword = isGoogleAccount
+      ? null
+      : await bcrypt.hash(password, await bcrypt.genSalt(10));
 
     const newUser = new User({
       firstName,
@@ -67,37 +56,40 @@ export const signup = async (req, res) => {
       email,
       password: hashedPassword,
       gender,
-      profilePic: gender == "male" ? boyProfilePic : girlProfilePic,
-      emailVerificationToken: token,
-      isEmailVerified: isVerified,
+      profilePic:
+        gender == "male"
+          ? `https://avatar.iran.liara.run/public/boy?username=${username}`
+          : `https://avatar.iran.liara.run/public/girl?username=${username}`,
       isGoogleAccount,
+      isEmailVerified: isGoogleAccount ? true : false,
+      emailVerificationToken: isGoogleAccount ? null : generateEmailToken(),
     });
 
-    if (newUser) {
-      generateJwtToken(newUser._id, res);
-      await newUser.save();
+    await newUser.save();
+    generateJwtToken(newUser._id, res);
 
-      res.status(201).json({
-        _id: newUser._id,
-        firstName: newUser.firstName,
-        lastName: newUser.lastName,
-        username: newUser.username,
-        profilePic: newUser.profilePic,
-      });
+    res.status(201).json({
+      _id: newUser._id,
+      firstName: newUser.firstName,
+      lastName: newUser.lastName,
+      username: newUser.username,
+      profilePic: newUser.profilePic,
+      isEmailVerified: newUser.isEmailVerified,
+    });
 
-      if (!isGoogleAccount) {
-        const verificationUrl =
-          process.env.NODE_ENV === "production"
-            ? `https://popcorn-4gmf.onrender.com/api/auth/verify-email?token=${token}`
-            : `http://localhost:5000/api/auth/verify-email?token=${token}`;
+    if (!isGoogleAccount) {
+      const verificationUrl =
+        process.env.NODE_ENV === "production"
+          ? `https://popcorn-4gmf.onrender.com/api/auth/verify-email?token=${newUser.emailVerificationToken}`
+          : `http://localhost:5000/api/auth/verify-email?token=${newUser.emailVerificationToken}`;
 
-        sendVerificationEmail(newUser.email, verificationUrl);
-      }
-    } else {
-      res.status(400).json({ error: "Invalid user data" });
+      sendVerificationEmail(newUser.email, verificationUrl);
     }
   } catch (error) {
     console.error(error);
+    res
+      .status(500)
+      .json({ error: "An error occurred during the signup process" });
   }
 };
 
