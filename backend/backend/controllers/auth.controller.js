@@ -45,9 +45,10 @@ export const signup = async (req, res) => {
       return res.status(400).json({ error: "Email is already in use" });
     }
 
-    const hashedPassword = isGoogleAccount
-      ? null
-      : await bcrypt.hash(password, await bcrypt.genSalt(10));
+    const hashedPassword = await bcrypt.hash(
+      password,
+      await bcrypt.genSalt(10)
+    );
 
     const newUser = new User({
       firstName,
