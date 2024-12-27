@@ -89,10 +89,16 @@ public interface ApiService {
     @GET("api/tmdb/trending")
     Call<MoviesResponse> getTrendingMovies(@Query("page") int page);
 
-    @GET("api/tmdb/{type}")
+    @GET("api/tmdb/type/{type}")
     Call<MoviesResponse> getMoviesByType(@Path("type") String type, @Query("page") int page);
 
     @POST("api/auth/logout")
     Call<Void> logoutUser();
+
+    @POST("api/auth/is-verified/{userId}")
+    Call<VerificationResponse> checkEmailVerifiedGoogle(@Path("userId") String userId);
+
+    @GET("api/auth/user/email/{email}")
+    Call<UserResponse> getUserByEmail(@Path("email") String email);
 
 }

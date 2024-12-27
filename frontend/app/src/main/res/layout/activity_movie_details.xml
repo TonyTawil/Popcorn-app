@@ -56,7 +56,7 @@
 
             <Button
                 android:id="@+id/addToWatchlistButton"
-                android:layout_width="wrap_content"
+                android:layout_width="170dp"
                 android:layout_height="wrap_content"
                 android:textColor="@color/white"
                 android:text="Add to Watchlist"
@@ -68,7 +68,7 @@
 
             <Button
                 android:id="@+id/markAsWatchedButton"
-                android:layout_width="wrap_content"
+                android:layout_width="170dp"
                 android:layout_height="wrap_content"
                 android:textColor="@color/white"
                 android:backgroundTint="@color/colorPrimary"
@@ -80,7 +80,7 @@
 
             <Button
                 android:id="@+id/addReviewButton"
-                android:layout_width="wrap_content"
+                android:layout_width="170dp"
                 android:layout_height="wrap_content"
                 android:text="Add Review"
                 android:textColor="@color/white"
@@ -92,12 +92,24 @@
 
             <Button
                 android:id="@+id/viewAllReviewsButton"
-                android:layout_width="wrap_content"
+                android:layout_width="170dp"
                 android:layout_height="wrap_content"
                 android:text="View All Reviews"
                 android:textColor="@color/white"
                 android:backgroundTint="@color/colorPrimary"
                 app:layout_constraintTop_toBottomOf="@id/addReviewButton"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="8dp"/>
+
+            <Button
+                android:id="@+id/playTrailerButton"
+                android:layout_width="170dp"
+                android:layout_height="wrap_content"
+                android:text="Play Trailer"
+                android:textColor="@color/white"
+                android:backgroundTint="@color/colorPrimary"
+                app:layout_constraintTop_toBottomOf="@id/viewAllReviewsButton"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:layout_marginTop="8dp"/>
@@ -110,7 +122,7 @@
                 android:textSize="16sp"
                 android:layout_marginTop="8dp"
                 android:padding="16dp"
-                app:layout_constraintTop_toBottomOf="@id/viewAllReviewsButton"
+                app:layout_constraintTop_toBottomOf="@id/playTrailerButton"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 

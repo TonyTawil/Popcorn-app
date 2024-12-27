@@ -40,14 +40,23 @@ public class NavigationManager {
 
         if (isLoggedIn) {
             navigationView.inflateMenu(R.menu.logged_in_drawer_menu);
-            String userName = sharedPreferences.getString("firstName", "") + " " + sharedPreferences.getString("lastName", "");
-            navHeaderTextView.setText("Welcome " + userName + "!");
+            String firstName = sharedPreferences.getString("firstName", "");
+            String lastName = sharedPreferences.getString("lastName", "");
+
+            // Check if the names are "N/A" and adjust the greeting accordingly
+            if (firstName.equals("N/A") || lastName.equals("N/A")) {
+                navHeaderTextView.setText("Welcome!");
+            } else {
+                String fullName = firstName + " " + lastName;
+                navHeaderTextView.setText("Welcome " + fullName.trim() + "!");
+            }
         } else {
             navigationView.inflateMenu(R.menu.drawer_menu);
             navHeaderTextView.setText("Welcome to Popcorn!");
             setupSignUpMenuItem();
         }
     }
+
 
     private void setupSignUpMenuItem() {
         MenuItem signUpItem = navigationView.getMenu().findItem(R.id.nav_signup);

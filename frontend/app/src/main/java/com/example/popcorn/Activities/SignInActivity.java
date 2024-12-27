@@ -1,12 +1,14 @@
 package com.example.popcorn.Activities;
 
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -16,13 +18,22 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.popcorn.DTOs.LoginUser;
+import com.example.popcorn.DTOs.UserResponse;
 import com.example.popcorn.Networking.ApiService;
 import com.example.popcorn.Networking.RetrofitClient;
-import com.example.popcorn.DTOs.UserResponse;
 import com.example.popcorn.R;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
+import com.google.gson.Gson;
 
 import java.io.IOException;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -34,6 +45,8 @@ public class SignInActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle toggle;
     private TextView signUpClickable;
+    private GoogleSignInClient mGoogleSignInClient;
+    private static final int RC_SIGN_IN = 9001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,23 +63,116 @@ public class SignInActivity extends AppCompatActivity {
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        toggle.getDrawerArrowDrawable().setColor(getResources().getColor(android.R.color.white));
-
         usernameEditText = findViewById(R.id.usernameEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
         signInButton = findViewById(R.id.signInButton);
         signUpClickable = findViewById(R.id.signUpClickable);
 
+        // Inside your activity or authentication class
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+
+        SignInButton googleSignInButton = findViewById(R.id.sign_in_with_google_button);
+        googleSignInButton.setSize(SignInButton.SIZE_STANDARD);
+        googleSignInButton.setOnClickListener(v -> signInWithGoogle());
+
         signInButton.setOnClickListener(v -> performLogin());
         signUpClickable.setOnClickListener(v -> navigateToSignUp());
 
-        ImageView searchIcon = findViewById(R.id.search_icon);
-        searchIcon.setOnClickListener(view -> {
-            Intent intent = new Intent(this, SearchActivity.class);
-            startActivity(intent);
-        });
+        navigationView.setNavigationItemSelectedListener(this::handleNavigationItemSelected);
+    }
 
-        navigationView.setNavigationItemSelectedListener(item -> handleNavigationItemSelected(item));
+    private void signInWithGoogle() {
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RC_SIGN_IN) {
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            handleSignInResult(task);
+        }
+    }
+
+    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
+        try {
+            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+            if (account != null) {
+                // Serialize the GoogleSignInAccount object to JSON
+                Gson gson = new Gson();
+                String accountJson = gson.toJson(account);
+                Log.i(TAG, "Google Sign In was successful: " + accountJson);
+                String idToken = account.getIdToken();
+                Log.i(TAG, "Google ID Token: " + idToken);
+
+                fetchUserFromBackend(account.getEmail());
+            } else {
+                Log.w(TAG, "signInResult:failed - account is null");
+                updateUI(null);
+            }
+        } catch (ApiException e) {
+            Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
+            updateUI(null);
+        }
+    }
+
+    private void fetchUserFromBackend(String email) {
+        ApiService apiService = RetrofitClient.getRetrofitInstance(this).create(ApiService.class);
+        Call<UserResponse> call = apiService.getUserByEmail(email);
+        call.enqueue(new Callback<UserResponse>() {
+            @Override
+            public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    UserResponse user = response.body();
+                    saveUserDetailsAndNavigate(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail());
+                } else {
+                    Log.w(TAG, "User fetch failed: " + response.message());
+                    updateUI(null); // Optionally handle user creation or show an error
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserResponse> call, Throwable t) {
+                Log.e(TAG, "Network error: " + t.getMessage());
+                updateUI(null);
+            }
+        });
+    }
+
+    private void saveUserDetailsAndNavigate(String userId, String firstName, String lastName, String email) {
+        SharedPreferences prefs = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("userId", userId);
+        editor.putString("firstName", firstName);
+        editor.putString("lastName", lastName);
+        editor.putString("email", email);
+        editor.apply();
+
+        Toast.makeText(this, "Signed in as: " + email, Toast.LENGTH_SHORT).show();
+        navigateToMainActivity();
+    }
+
+    private void updateUI(GoogleSignInAccount account) {
+        if (account != null) {
+            Toast.makeText(this, "Signed in as: " + account.getEmail(), Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Failed to sign in with Google.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void navigateToMainActivity() {
+        Intent intent = new Intent(SignInActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     private void performLogin() {
@@ -79,7 +185,8 @@ public class SignInActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    saveUserDetailsAndNavigate(response.body());
+                    UserResponse user = response.body();
+                    saveUserDetailsAndNavigate(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail());
                 } else {
                     handleLoginError(response);
                 }
@@ -92,19 +199,6 @@ public class SignInActivity extends AppCompatActivity {
         });
     }
 
-    private void saveUserDetailsAndNavigate(UserResponse user) {
-        SharedPreferences prefs = getSharedPreferences("MyPrefs", MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString("userId", user.getId());
-        editor.putString("firstName", user.getFirstName());
-        editor.putString("lastName", user.getLastName());
-        editor.apply();
-
-        Intent intent = new Intent(SignInActivity.this, MainActivity.class);
-        startActivity(intent);
-        finish();
-    }
-
     private void handleLoginError(Response<UserResponse> response) {
         try {
             Toast.makeText(SignInActivity.this, "Login failed: " + response.errorBody().string(), Toast.LENGTH_LONG).show();
@@ -115,7 +209,6 @@ public class SignInActivity extends AppCompatActivity {
 
     private void navigateToSignUp() {
         Intent intent = new Intent(this, SignUpActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
 
@@ -127,7 +220,6 @@ public class SignInActivity extends AppCompatActivity {
             return true;
         } else if (id == R.id.nav_home) {
             Intent intent = new Intent(this, MainActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             drawerLayout.closeDrawer(GravityCompat.START);
             return true;
