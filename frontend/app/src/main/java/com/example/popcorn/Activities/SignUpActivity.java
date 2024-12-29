@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,7 +39,8 @@ public class SignUpActivity extends AppCompatActivity {
 
     private EditText firstNameEditText, lastNameEditText, usernameEditText, emailEditText, passwordEditText, confirmPasswordEditText;
     private Spinner genderSpinner;
-    private Button signUpButton, googleSignUpButton;
+    private Button signUpButton;
+    private ImageView googleSignUpButton;
     private TextView signInPrompt, signInClickable;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle toggle;

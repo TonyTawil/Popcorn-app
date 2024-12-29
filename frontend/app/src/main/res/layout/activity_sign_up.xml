@@ -169,25 +169,21 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Or:"
+                android:text="Or: Continue with google"
                 android:layout_marginTop="10dp"
                 android:gravity="center"
                 android:textColor="@android:color/white"
                 android:textSize="16sp"
                 android:padding="8dp"/>
 
-            <Button
+            <ImageView
                 android:id="@+id/googleSignUpButton"
-                style="@style/Widget.AppCompat.Button.Colored"
-                android:layout_width="40dp"
+                android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:layout_gravity="center"
-                android:layout_marginTop="16dp"
-                android:text="Continue with Google"
-                android:drawableLeft="@drawable/google"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
-                android:textAllCaps="false" />
+                android:layout_marginTop="8dp"
+                android:src="@drawable/google" />
+
 
 
             <TextView
