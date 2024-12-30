@@ -95,10 +95,10 @@ public interface ApiService {
     @POST("api/auth/logout")
     Call<Void> logoutUser();
 
-    @POST("api/auth/is-verified/{userId}")
-    Call<VerificationResponse> checkEmailVerifiedGoogle(@Path("userId") String userId);
-
     @GET("api/auth/user/email/{email}")
     Call<UserResponse> getUserByEmail(@Path("email") String email);
+
+    @GET("api/tmdb/search")
+    Call<MoviesResponse> searchMovies(@Query("query") String query);
 
 }

@@ -19,8 +19,6 @@
             android:layout_height="wrap_content"
             android:paddingBottom="16dp">
 
-
-
             <com.google.android.material.appbar.AppBarLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -36,22 +34,38 @@
                     <include layout="@layout/toolbar_title_layout" />
 
                 </androidx.appcompat.widget.Toolbar>
-
             </com.google.android.material.appbar.AppBarLayout>
 
-            <EditText
-                android:id="@+id/searchEditText"
-                android:layout_marginTop="10dp"
+            <!-- Horizontal LinearLayout for the search EditText and Button -->
+            <LinearLayout
+                android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Search..."
-                android:inputType="text" />
+                android:layout_marginTop="10dp">
+
+                <EditText
+                    android:id="@+id/searchEditText"
+                    android:layout_width="255dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:layout_weight="1"
+                    android:hint="Search..."
+                    android:inputType="text" />
+
+                <Button
+                    android:id="@+id/searchButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Search"
+                    android:textColor="@color/white"
+                    android:backgroundTint="@color/colorPrimary"/>
+
+            </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/searchResultsRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
-
         </LinearLayout>
     </ScrollView>
 
@@ -64,6 +78,4 @@
         app:headerLayout="@layout/nav_header"
         app:menu="@menu/drawer_menu"
         app:itemTextColor="@color/color_state_list" />
-
-
 </androidx.drawerlayout.widget.DrawerLayout>
