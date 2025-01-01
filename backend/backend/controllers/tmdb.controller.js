@@ -96,3 +96,36 @@ export const searchMovies = async (req, res) => {
     });
   }
 };
+
+export const getMovieVideos = async (req, res) => {
+  const { movieId } = req.params;
+  try {
+    const response = await axios.get(
+      `https://api.themoviedb.org/3/movie/${movieId}/videos?api_key=${process.env.API_KEY}`
+    );
+    let filteredVideos = response.data.results.filter(
+      (video) =>
+        video.site === "YouTube" &&
+        video.type === "Trailer" &&
+        video.official === true &&
+        video.name.toLowerCase().includes("official trailer")
+    );
+
+    // If no videos match the stricter criteria, fallback to less strict criteria
+    if (filteredVideos.length === 0) {
+      filteredVideos = response.data.results.filter(
+        (video) =>
+          video.site === "YouTube" &&
+          video.type === "Trailer" &&
+          video.official === true
+      );
+    }
+
+    res.json({ id: response.data.id, results: filteredVideos });
+  } catch (error) {
+    res.status(500).json({
+      message: `Error fetching videos for movie ID ${movieId}`,
+      error: error.message,
+    });
+  }
+};
