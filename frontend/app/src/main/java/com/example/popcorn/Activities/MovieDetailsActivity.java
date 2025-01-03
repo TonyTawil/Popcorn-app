@@ -2,6 +2,7 @@ package com.example.popcorn.Activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
@@ -36,6 +37,13 @@ import com.example.popcorn.Utils.LogoutManager;
 import com.example.popcorn.Utils.NavigationManager;
 import com.google.android.material.navigation.NavigationView;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,8 +55,9 @@ public class MovieDetailsActivity extends AppCompatActivity {
     private RecyclerView castRecyclerView, crewRecyclerView, similarMoviesRecyclerView;
     private DrawerLayout drawerLayout;
     private NavigationManager navigationManager;
-    private Button addToWatchlistButton, markAsWatchedButton, addReviewButton, viewReviewsButton;
+    private Button addToWatchlistButton, markAsWatchedButton, addReviewButton, viewReviewsButton, playTrailerButton;
     private SharedPreferences sharedPreferences;
+    private String apiKey = "0b8fd19c988298f0d68d8b054667e493";
     private int movieId;
 
     @Override
@@ -72,12 +81,15 @@ public class MovieDetailsActivity extends AppCompatActivity {
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationManager = new NavigationManager(this, navigationView, drawerLayout);
         navigationManager.updateDrawerContents();
+
         setupDrawer(toolbar);
+        setupNavigationMenu(navigationView);
 
         castRecyclerView = findViewById(R.id.castRecyclerView);
         crewRecyclerView = findViewById(R.id.crewRecyclerView);
         similarMoviesRecyclerView = findViewById(R.id.similarMoviesRecyclerView);
-        similarMoviesRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+
+        similarMoviesRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
         displayMovieDetails();
         initRecyclerViews();
@@ -87,19 +99,54 @@ public class MovieDetailsActivity extends AppCompatActivity {
         markAsWatchedButton = findViewById(R.id.markAsWatchedButton);
         addReviewButton = findViewById(R.id.addReviewButton);
         viewReviewsButton = findViewById(R.id.viewAllReviewsButton);
+        playTrailerButton = findViewById(R.id.playTrailerButton);
 
         addToWatchlistButton.setOnClickListener(v -> addToWatchlist());
         markAsWatchedButton.setOnClickListener(v -> addToWatched());
         addReviewButton.setOnClickListener(v -> openAddReviewActivity());
         viewReviewsButton.setOnClickListener(v -> openReviewsActivity());
-
-        setupNavigationMenu(navigationView);
+        playTrailerButton.setOnClickListener(v -> playTrailer());
 
         ImageView searchIcon = findViewById(R.id.search_icon);
-        searchIcon.setOnClickListener(view -> {
-            Intent intent = new Intent(this, SearchActivity.class);
-            startActivity(intent);
-        });
+        searchIcon.setOnClickListener(view -> startActivity(new Intent(this, SearchActivity.class)));
+    }
+
+    private void playTrailer() {
+        new Thread(() -> {
+            try {
+                URL url = new URL("https://api.themoviedb.org/3/movie/" + movieId + "/videos?api_key=" + apiKey);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                connection.connect();
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                JSONObject jsonResponse = new JSONObject(response.toString());
+                JSONArray results = jsonResponse.getJSONArray("results");
+                if (results.length() > 0) {
+                    for (int i = 0; i < results.length(); i++) {
+                        JSONObject video = results.getJSONObject(i);
+                        if ("Trailer".equals(video.getString("type")) && "YouTube".equals(video.getString("site"))) {
+                            String key = video.getString("key");
+                            runOnUiThread(() -> {
+                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=" + key)));
+                            });
+                            return;
+                        }
+                    }
+                }
+                runOnUiThread(() -> Toast.makeText(MovieDetailsActivity.this, "No trailer available", Toast.LENGTH_SHORT).show());
+            } catch (Exception e) {
+                Log.e("MovieDetailsActivity", "Error fetching trailer", e);
+                runOnUiThread(() -> Toast.makeText(MovieDetailsActivity.this, "Failed to fetch trailer", Toast.LENGTH_SHORT).show());
+            }
+        }).start();
     }
 
     private void fetchSimilarMovies() {
