@@ -89,7 +89,7 @@ public class MovieDetailsActivity extends AppCompatActivity {
         crewRecyclerView = findViewById(R.id.crewRecyclerView);
         similarMoviesRecyclerView = findViewById(R.id.similarMoviesRecyclerView);
 
-        similarMoviesRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        similarMoviesRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
         displayMovieDetails();
         initRecyclerViews();
