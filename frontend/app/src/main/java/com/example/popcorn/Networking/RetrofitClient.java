@@ -22,7 +22,7 @@ public class RetrofitClient {
             httpClient.cache(cache);
 
             retrofit = new Retrofit.Builder()
-                    .baseUrl("http://10.0.2.2:5000/")
+                    .baseUrl("https://popcorn-4gmf.onrender.com/")
                     .addConverterFactory(GsonConverterFactory.create())
                     .client(httpClient.build())
                     .build();

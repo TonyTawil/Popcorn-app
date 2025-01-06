@@ -6,6 +6,7 @@ import com.example.popcorn.DTOs.MovieResponse;
 import com.example.popcorn.DTOs.MoviesResponse;
 import com.example.popcorn.DTOs.ReviewRequest;
 import com.example.popcorn.DTOs.ReviewResponse;
+import com.example.popcorn.DTOs.TrailerResponse;
 import com.example.popcorn.DTOs.UserResponse;
 import com.example.popcorn.DTOs.VerificationResponse;
 import com.example.popcorn.DTOs.WatchlistAddRequest;
@@ -100,5 +101,8 @@ public interface ApiService {
 
     @GET("api/tmdb/search")
     Call<MoviesResponse> searchMovies(@Query("query") String query);
+
+    @GET("api/tmdb/movie/{movieId}/videos")
+    Call<TrailerResponse> fetchMovieTrailers(@Path("movieId") int movieId);
 
 }

@@ -21,6 +21,7 @@ import com.bumptech.glide.Glide;
 import com.example.popcorn.Adapters.PeopleAdapter;
 import com.example.popcorn.DTOs.CreditsResponse;
 import com.example.popcorn.DTOs.MovieResponse;
+import com.example.popcorn.DTOs.TrailerResponse;
 import com.example.popcorn.DTOs.WatchedAddRequest;
 import com.example.popcorn.DTOs.WatchedAddResponse;
 import com.example.popcorn.DTOs.WatchlistAddRequest;
@@ -36,11 +37,14 @@ import com.example.popcorn.R;
 import com.example.popcorn.Utils.LogoutManager;
 import com.example.popcorn.Utils.NavigationManager;
 import com.google.android.material.navigation.NavigationView;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -112,42 +116,49 @@ public class MovieDetailsActivity extends AppCompatActivity {
     }
 
     private void playTrailer() {
-        new Thread(() -> {
-            try {
-                URL url = new URL("https://api.themoviedb.org/3/movie/" + movieId + "/videos?api_key=" + apiKey);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("GET");
-                connection.connect();
+        ApiService apiService = RetrofitClient.getRetrofitInstance(this).create(ApiService.class);
+        Call<TrailerResponse> call = apiService.fetchMovieTrailers(movieId);
 
-                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                StringBuilder response = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    response.append(line);
-                }
-                reader.close();
-
-                JSONObject jsonResponse = new JSONObject(response.toString());
-                JSONArray results = jsonResponse.getJSONArray("results");
-                if (results.length() > 0) {
-                    for (int i = 0; i < results.length(); i++) {
-                        JSONObject video = results.getJSONObject(i);
-                        if ("Trailer".equals(video.getString("type")) && "YouTube".equals(video.getString("site"))) {
-                            String key = video.getString("key");
-                            runOnUiThread(() -> {
-                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=" + key)));
-                            });
-                            return;
-                        }
+        call.enqueue(new Callback<TrailerResponse>() {
+            @Override
+            public void onResponse(Call<TrailerResponse> call, Response<TrailerResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<TrailerResponse.Trailer> results = response.body().getResults();
+                    if (!results.isEmpty()) {
+                        String key = results.get(0).getKey();
+                        runOnUiThread(() -> {
+                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=" + key));
+                            intent.putExtra("force_fullscreen", true);
+                            if (intent.resolveActivity(getPackageManager()) != null) {
+                                startActivity(intent);
+                            } else {
+                                Toast.makeText(MovieDetailsActivity.this, "YouTube app not installed", Toast.LENGTH_SHORT).show();
+                                intent.setData(Uri.parse("https://www.youtube.com/watch?v=" + key));
+                                startActivity(intent);
+                            }
+                        });
+                    } else {
+                        runOnUiThread(() -> Toast.makeText(MovieDetailsActivity.this, "No trailer available", Toast.LENGTH_SHORT).show());
                     }
+                } else {
+                    try {
+                        String errorBody = response.errorBody() != null ? response.errorBody().string() : "Error body is null";
+                        Log.e("MovieDetailsActivity", "Unsuccessful response, error body: " + errorBody);
+                    } catch (IOException e) {
+                        Log.e("MovieDetailsActivity", "Error reading error body", e);
+                    }
+                    runOnUiThread(() -> Toast.makeText(MovieDetailsActivity.this, "Failed to fetch trailer", Toast.LENGTH_SHORT).show());
                 }
-                runOnUiThread(() -> Toast.makeText(MovieDetailsActivity.this, "No trailer available", Toast.LENGTH_SHORT).show());
-            } catch (Exception e) {
-                Log.e("MovieDetailsActivity", "Error fetching trailer", e);
-                runOnUiThread(() -> Toast.makeText(MovieDetailsActivity.this, "Failed to fetch trailer", Toast.LENGTH_SHORT).show());
             }
-        }).start();
+
+            @Override
+            public void onFailure(Call<TrailerResponse> call, Throwable t) {
+                Log.e("MovieDetailsActivity", "Network error while fetching trailer", t);
+                runOnUiThread(() -> Toast.makeText(MovieDetailsActivity.this, "Error fetching trailer: " + t.getMessage(), Toast.LENGTH_SHORT).show());
+            }
+        });
     }
+
 
     private void fetchSimilarMovies() {
         new FetchSimilarMoviesTask(similarMoviesRecyclerView, movieId, this).execute();
