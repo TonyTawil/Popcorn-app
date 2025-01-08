@@ -73,8 +73,9 @@ public class SignUpActivity extends AppCompatActivity {
         signInPrompt = findViewById(R.id.signInPrompt);
         signInClickable = findViewById(R.id.signInClickable);
 
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.gender_options, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.gender_options, R.layout.spinner_selected_item); // Use custom layout for selected item
+        adapter.setDropDownViewResource(R.layout.spinner_item); // Use custom layout for dropdown items
         genderSpinner.setAdapter(adapter);
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)

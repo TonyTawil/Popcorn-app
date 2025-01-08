@@ -13,7 +13,6 @@ public class RetrofitClient {
 
     public static Retrofit getRetrofitInstance(Context context) {
         if (retrofit == null) {
-            // Setup cache
             File httpCacheDirectory = new File(context.getCacheDir(), "responses");
             int cacheSize = 10 * 1024 * 1024;
             Cache cache = new Cache(httpCacheDirectory, cacheSize);
