@@ -63,6 +63,9 @@ public class SignInActivity extends AppCompatActivity {
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
+        toggle.getDrawerArrowDrawable().setColor(getResources().getColor(android.R.color.white));
+
+
         usernameEditText = findViewById(R.id.usernameEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
         signInButton = findViewById(R.id.signInButton);
@@ -89,9 +92,13 @@ public class SignInActivity extends AppCompatActivity {
     }
 
     private void signInWithGoogle() {
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
+        // Attempt to sign out the user before signing in to force account selection every time
+        mGoogleSignInClient.signOut().addOnCompleteListener(this, task -> {
+            Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+            startActivityForResult(signInIntent, RC_SIGN_IN);
+        });
     }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

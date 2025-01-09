@@ -132,7 +132,6 @@ public class MovieDetailsActivity extends AppCompatActivity {
                             if (intent.resolveActivity(getPackageManager()) != null) {
                                 startActivity(intent);
                             } else {
-                                Toast.makeText(MovieDetailsActivity.this, "YouTube app not installed", Toast.LENGTH_SHORT).show();
                                 intent.setData(Uri.parse("https://www.youtube.com/watch?v=" + key));
                                 startActivity(intent);
                             }
