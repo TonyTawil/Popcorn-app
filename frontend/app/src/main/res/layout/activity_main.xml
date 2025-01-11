@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".Activities.MainActivity">
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true"
@@ -58,6 +58,7 @@
                 android:paddingTop="8dp"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
+                android:nestedScrollingEnabled="false"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 
             <Button
@@ -135,7 +136,7 @@
                 android:backgroundTint="@color/colorPrimary"/>
 
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view"
