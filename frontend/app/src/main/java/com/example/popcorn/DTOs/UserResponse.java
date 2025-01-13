@@ -17,7 +17,6 @@ public class UserResponse {
         this.gender = gender;
     }
 
-    // Getters
     public String getId() {
         return _id;
     }

@@ -71,7 +71,6 @@ public class SignInActivity extends AppCompatActivity {
         signInButton = findViewById(R.id.signInButton);
         signUpClickable = findViewById(R.id.signUpClickable);
 
-        // Inside your activity or authentication class
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
@@ -92,7 +91,6 @@ public class SignInActivity extends AppCompatActivity {
     }
 
     private void signInWithGoogle() {
-        // Attempt to sign out the user before signing in to force account selection every time
         mGoogleSignInClient.signOut().addOnCompleteListener(this, task -> {
             Intent signInIntent = mGoogleSignInClient.getSignInIntent();
             startActivityForResult(signInIntent, RC_SIGN_IN);
@@ -114,7 +112,6 @@ public class SignInActivity extends AppCompatActivity {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             if (account != null) {
-                // Serialize the GoogleSignInAccount object to JSON
                 Gson gson = new Gson();
                 String accountJson = gson.toJson(account);
                 Log.i(TAG, "Google Sign In was successful: " + accountJson);
@@ -143,7 +140,7 @@ public class SignInActivity extends AppCompatActivity {
                     saveUserDetailsAndNavigate(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail());
                 } else {
                     Log.w(TAG, "User fetch failed: " + response.message());
-                    updateUI(null); // Optionally handle user creation or show an error
+                    updateUI(null);
                 }
             }
 

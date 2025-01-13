@@ -36,7 +36,6 @@
                 </androidx.appcompat.widget.Toolbar>
             </com.google.android.material.appbar.AppBarLayout>
 
-            <!-- Horizontal LinearLayout for the search EditText and Button -->
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"

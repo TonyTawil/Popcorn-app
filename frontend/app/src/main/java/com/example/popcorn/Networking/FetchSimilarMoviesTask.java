@@ -25,7 +25,6 @@ public class FetchSimilarMoviesTask extends AsyncTask<Void, Void, List<Movie>> {
     public FetchSimilarMoviesTask(RecyclerView recyclerView, int movieId, Context context) {
         this.recyclerView = recyclerView;
         this.movieId = movieId;
-        // Utilizing the Retrofit client with caching
         this.apiService = RetrofitClient.getRetrofitInstance(context).create(ApiService.class);
     }
 

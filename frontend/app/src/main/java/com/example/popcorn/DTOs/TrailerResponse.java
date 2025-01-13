@@ -5,8 +5,6 @@ import java.util.List;
 public class TrailerResponse {
     private int id;
     private List<Trailer> results;
-
-    // Getters and Setters
     public int getId() {
         return id;
     }
@@ -28,7 +26,6 @@ public class TrailerResponse {
         private String site;
         private String type;
 
-        // Getters and Setters
         public String getKey() {
             return key;
         }

@@ -34,7 +34,6 @@ public class FetchMoviesTask extends AsyncTask<Void, Void, List<Movie>> {
         this.page = page;
         this.itemsPerPage = itemsPerPage;
         this.movieType = movieType;
-        // Ensuring the ApiService instance is initialized here using the context.
         this.apiService = RetrofitClient.getRetrofitInstance(context).create(ApiService.class);
     }
 

@@ -43,7 +43,6 @@ public class NavigationManager {
             String firstName = sharedPreferences.getString("firstName", "");
             String lastName = sharedPreferences.getString("lastName", "");
 
-            // Check if the names are "N/A" and adjust the greeting accordingly
             if (firstName.equals("N/A") || lastName.equals("N/A")) {
                 navHeaderTextView.setText("Welcome!");
             } else {

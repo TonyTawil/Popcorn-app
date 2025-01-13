@@ -87,9 +87,6 @@ public interface ApiService {
     @GET("api/tmdb/credits/{movieId}")
     Call<CreditsResponse> fetchMovieCredits(@Path("movieId") int movieId);
 
-    @GET("api/tmdb/trending")
-    Call<MoviesResponse> getTrendingMovies(@Query("page") int page);
-
     @GET("api/tmdb/type/{type}")
     Call<MoviesResponse> getMoviesByType(@Path("type") String type, @Query("page") int page);
 

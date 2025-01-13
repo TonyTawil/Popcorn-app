@@ -78,8 +78,8 @@ public class SignUpActivity extends AppCompatActivity {
         signInClickable = findViewById(R.id.signInClickable);
 
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.gender_options, R.layout.spinner_selected_item); // Use custom layout for selected item
-        adapter.setDropDownViewResource(R.layout.spinner_item); // Use custom layout for dropdown items
+                R.array.gender_options, R.layout.spinner_selected_item);
+        adapter.setDropDownViewResource(R.layout.spinner_item);
         genderSpinner.setAdapter(adapter);
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -126,12 +126,12 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private void registerUser(GoogleSignInAccount account) {
-        String firstName = account.getGivenName() != null ? account.getGivenName() : "N/A"; // Default if not provided
-        String lastName = account.getFamilyName() != null ? account.getFamilyName() : "N/A"; // Default if not provided
+        String firstName = account.getGivenName() != null ? account.getGivenName() : "N/A";
+        String lastName = account.getFamilyName() != null ? account.getFamilyName() : "N/A";
         String email = account.getEmail();
-        String defaultPassword = "Google" + System.currentTimeMillis();  // Note: Consider a more secure password generation method
-        String gender = "other";  // Default gender
-        String username = email.split("@")[0];  // Suggested username based on email prefix
+        String defaultPassword = "Google" + System.currentTimeMillis();
+        String gender = "other";
+        String username = email.split("@")[0];
 
         User newUser = new User(firstName, lastName, username, email, defaultPassword, defaultPassword, gender, true);
         ApiService apiService = RetrofitClient.getRetrofitInstance(this).create(ApiService.class);
@@ -141,8 +141,8 @@ public class SignUpActivity extends AppCompatActivity {
             public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     Toast.makeText(SignUpActivity.this, "User registered successfully.", Toast.LENGTH_LONG).show();
-                    saveUserDetails(response.body().getId(), firstName, lastName, email); // Assuming your UserResponse has these fields
-                    navigateToMainActivity();  // Navigate directly to MainActivity
+                    saveUserDetails(response.body().getId(), firstName, lastName, email);
+                    navigateToMainActivity();
                 } else {
                     try {
                         Toast.makeText(SignUpActivity.this, "Registration failed: " + response.errorBody().string(), Toast.LENGTH_LONG).show();
