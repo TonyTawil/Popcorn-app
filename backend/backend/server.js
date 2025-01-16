@@ -19,17 +19,19 @@ dotenv.config();
 app.use(cookieParser());
 
 app.use(cors({
-  origin: 'http://localhost:5173', // Be explicit about the origin
+  origin: ['http://localhost:5173', 'http://localhost:5000'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
 }));
 
 app.use(express.json());
 
-// Debug middleware to log all requests and cookies
+// Debug middleware to log all requests
 app.use((req, res, next) => {
   console.log('Request URL:', req.url);
+  console.log('Request headers:', req.headers);
+  console.log('Request origin:', req.get('origin'));
   console.log('Cookies:', req.cookies);
   next();
 });

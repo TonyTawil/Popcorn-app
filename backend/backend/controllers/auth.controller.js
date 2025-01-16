@@ -71,29 +71,19 @@ export const signup = async (req, res) => {
     });
 
     const savedUser = await newUser.save();
-    console.log("Saved user verification details:", {
-      id: savedUser._id,
-      email: savedUser.email,
-      token: savedUser.emailVerificationToken,
-      expiry: savedUser.emailVerificationTokenExpiry
+    
+    // Double-check the saved user
+    const verifiedSave = await User.findById(savedUser._id);
+    console.log("Verification details after save:", {
+      token: verifiedSave.emailVerificationToken,
+      expiry: verifiedSave.emailVerificationTokenExpiry,
+      email: verifiedSave.email
     });
 
     if (!isGoogleAccount) {
       const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
       await sendVerificationEmail(newUser.email, verificationUrl);
     }
-
-    const token = jwt.sign({ userId: savedUser._id }, process.env.JWT_SECRET, {
-      expiresIn: "30d",
-    });
-
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-      path: '/'
-    });
 
     res.status(201).json({
       _id: savedUser._id,
@@ -122,22 +112,27 @@ export const login = async (req, res) => {
       return res.status(401).json({ error: "Invalid email or password" });
     }
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
+    if (!user.isEmailVerified) {
+      return res.status(401).json({ 
+        error: "Please verify your email before logging in",
+        needsVerification: true 
+      });
+    }
 
-    // Set cookie with explicit settings
+    const token = generateJwtToken(user._id, user.isEmailVerified, res);
+
+    if (!token) {
+      return res.status(400).json({ 
+        error: "Failed to generate authentication token" 
+      });
+    }
+
     res.cookie('token', token, {
       httpOnly: true,
       secure: false, // Set to true in production
       sameSite: 'lax',
       path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
-
-    console.log('Setting cookie in login:', {
-      token: token.substring(0, 20) + '...',
-      cookies: res.getHeader('set-cookie')
     });
 
     res.json({
@@ -172,37 +167,57 @@ export const verifyEmail = async (req, res) => {
       return res.status(400).json({ error: "Verification token is required" });
     }
 
-    // First check if any user was previously verified with this token
-    const verifiedUser = await User.findOne({ 
-      $or: [
-        { emailVerificationToken: token },
-        { _id: { $in: await User.find({ isEmailVerified: true }).distinct('_id') } }
-      ]
-    });
-
-    if (verifiedUser && verifiedUser.isEmailVerified) {
-      // User is already verified, send success response with user data
-      return res.status(200).json({
-        message: "Email already verified",
-        user: {
-          _id: verifiedUser._id,
-          firstName: verifiedUser.firstName,
-          lastName: verifiedUser.lastName,
-          username: verifiedUser.username,
-          email: verifiedUser.email,
-          profilePic: verifiedUser.profilePic || verifiedUser.profilePicture || '',
-          verified: true
-        }
-      });
-    }
-
-    // Find user with valid token
+    // Find user with valid token - be more strict about the conditions
     const user = await User.findOne({ 
       emailVerificationToken: token,
       emailVerificationTokenExpiry: { $gt: Date.now() }
     });
 
+    console.log("Found user:", user ? {
+      email: user.email,
+      isVerified: user.isEmailVerified,
+      tokenExpiry: user.emailVerificationTokenExpiry,
+      currentTime: new Date(),
+    } : 'No user found');
+
+    // Debug log to check all users and their tokens
+    const allUsers = await User.find({}, 'email emailVerificationToken emailVerificationTokenExpiry');
+    console.log("All users verification tokens:", allUsers.map(u => ({
+      email: u.email,
+      token: u.emailVerificationToken,
+      expiry: u.emailVerificationTokenExpiry
+    })));
+
     if (!user) {
+      // Check if this token was already used for verification
+      const verifiedUser = await User.findOne({
+        emailVerificationToken: token
+      });
+
+      if (verifiedUser) {
+        // If already verified, still send success with user data
+        const jwtToken = generateJwtToken(verifiedUser._id, true, res);
+
+        if (!jwtToken) {
+          return res.status(400).json({ 
+            error: "Failed to generate authentication token" 
+          });
+        }
+
+        return res.status(200).json({
+          message: "Email already verified",
+          user: {
+            _id: verifiedUser._id,
+            firstName: verifiedUser.firstName,
+            lastName: verifiedUser.lastName,
+            username: verifiedUser.username,
+            email: verifiedUser.email,
+            profilePic: verifiedUser.profilePic || '',
+            verified: true
+          }
+        });
+      }
+
       return res.status(400).json({ 
         error: "Invalid or expired verification token" 
       });
@@ -210,12 +225,19 @@ export const verifyEmail = async (req, res) => {
 
     // Update user verification status
     user.isEmailVerified = true;
-    user.emailVerificationToken = undefined;
-    user.emailVerificationTokenExpiry = undefined;
+    // Don't remove the token immediately to allow for re-verification if needed
+    // user.emailVerificationToken = undefined;
+    // user.emailVerificationTokenExpiry = undefined;
     await user.save();
 
-    // Generate new JWT with updated verification status
-    generateJwtToken(user._id, res);
+    // Generate JWT token and set cookie
+    const jwtToken = generateJwtToken(user._id, true, res);
+
+    if (!jwtToken) {
+      return res.status(400).json({ 
+        error: "Failed to generate authentication token" 
+      });
+    }
 
     res.status(200).json({
       message: "Email verified successfully",
@@ -225,7 +247,7 @@ export const verifyEmail = async (req, res) => {
         lastName: user.lastName,
         username: user.username,
         email: user.email,
-        profilePic: user.profilePic || user.profilePicture || '',
+        profilePic: user.profilePic || '',
         verified: true
       }
     });

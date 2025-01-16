@@ -22,6 +22,18 @@ export const protect = async (req, res, next) => {
         return res.status(401).json({ error: 'User not found' });
       }
 
+      if (!user.isEmailVerified) {
+        console.log('User not verified');
+        res.cookie("token", "", {
+          httpOnly: true,
+          expires: new Date(0),
+        });
+        return res.status(401).json({ 
+          error: 'Email not verified',
+          needsVerification: true
+        });
+      }
+
       req.user = user;
       next();
     } catch (error) {

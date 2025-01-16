@@ -1,72 +1,66 @@
-import { useEffect, useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useEffect, useState, useCallback } from 'react'
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 const VerificationPage = () => {
   const navigate = useNavigate()
+  const location = useLocation()
   const [searchParams] = useSearchParams()
-  const { user, refreshUser } = useAuth()
+  const { login } = useAuth()
   const [verificationStatus, setVerificationStatus] = useState<'pending' | 'success' | 'error'>('pending')
   const [error, setError] = useState('')
   
-  useEffect(() => {
-    const verifyEmail = async () => {
-      const token = searchParams.get('token')
-      
-      if (token) {
-        try {
-          const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/auth/verify-email?token=${token}`, {
-            credentials: 'include',
-            headers: {
-              'Accept': 'application/json'
-            }
-          })
-          
-          const data = await response.json()
-          console.log('Verification response:', data)
-          
-          if (response.ok) {
-            setVerificationStatus('success')
-            if (data.user) {
-              await refreshUser()
-              setTimeout(() => navigate('/'), 3000)
-            }
-          } else {
-            setVerificationStatus('error')
-            setError(data.error || 'Verification failed')
-          }
-        } catch (err) {
-          console.error('Verification error:', err)
-          setVerificationStatus('error')
-          setError('Failed to verify email. Please try again.')
-        }
-      }
-    }
-
-    verifyEmail()
-  }, [searchParams])
-
-  const handleResendVerification = async () => {
-    if (!user?.email) return
-    
+  const handleVerification = useCallback(async (token: string) => {
     try {
-      const response = await fetch('/api/auth/resend-verification', {
-        method: 'POST',
+      const response = await fetch(`/api/auth/verify-email?token=${token}`, {
+        credentials: 'include',
         headers: {
+          'Accept': 'application/json',
           'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email: user.email })
+        }
       })
       
-      if (!response.ok) {
-        throw new Error('Failed to resend verification email')
-      }
+      const data = await response.json()
+      console.log('Verification response:', data)
       
-      alert('Verification email has been resent. Please check your inbox.')
+      if (response.ok || data.message?.includes('already verified')) {
+        setVerificationStatus('success')
+        if (data.user && data.user.verified) {
+          login(data.user)
+          setTimeout(() => {
+            navigate('/')
+          }, 2000)
+        }
+      } else {
+        setVerificationStatus('error')
+        setError(data.error || 'Verification failed')
+      }
     } catch (err) {
-      alert('Failed to resend verification email. Please try again.')
+      console.error('Verification error:', err)
+      setVerificationStatus('error')
+      setError('Failed to verify email. Please try again.')
     }
-  }
+  }, [login, navigate])
+
+  useEffect(() => {
+    const token = searchParams.get('token')
+    const isFromSignup = location.state?.fromSignup
+    
+    if (!token && isFromSignup) {
+      setVerificationStatus('success')
+      return
+    }
+
+    if (!token && !isFromSignup) {
+      setVerificationStatus('error')
+      setError('Verification token is missing')
+      return
+    }
+
+    if (token) {
+      handleVerification(token)
+    }
+  }, [searchParams, location.state?.fromSignup, handleVerification])
 
   return (
     <div className="min-h-[calc(100vh-64px)] flex items-center justify-center">
@@ -74,7 +68,7 @@ const VerificationPage = () => {
         {verificationStatus === 'pending' && (
           <>
             <h1 className="text-2xl font-bold text-white text-center mb-4">
-              Verifying Your Email
+              {searchParams.get('token') ? 'Verifying Your Email' : 'Preparing Verification...'}
             </h1>
             <div className="flex justify-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -82,7 +76,18 @@ const VerificationPage = () => {
           </>
         )}
 
-        {verificationStatus === 'success' && (
+        {verificationStatus === 'success' && !searchParams.get('token') && (
+          <>
+            <h1 className="text-2xl font-bold text-white text-center mb-4">
+              Verification Email Sent! 📧
+            </h1>
+            <p className="text-center text-gray-300 mb-4">
+              Please check your email inbox and click the verification link to complete your registration.
+            </p>
+          </>
+        )}
+
+        {verificationStatus === 'success' && searchParams.get('token') && (
           <>
             <h1 className="text-2xl font-bold text-white text-center mb-4">
               Email Verified Successfully! 🎉
@@ -102,10 +107,10 @@ const VerificationPage = () => {
               {error}
             </p>
             <button
-              onClick={handleResendVerification}
+              onClick={() => navigate('/signup')}
               className="w-full bg-primary hover:bg-primary-dark text-white py-3 px-4 rounded-lg transition-all"
             >
-              Resend Verification Email
+              Back to Signup
             </button>
           </>
         )}

@@ -2,12 +2,10 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import AuthInput from '../components/auth/AuthInput'
 import { signup as signupApi } from '../services/api'
-import { useAuth } from '../context/AuthContext'
 import PasswordInput from '../components/auth/PasswordInput'
 
 const SignupPage = () => {
   const navigate = useNavigate()
-  const { login: authLogin } = useAuth()
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -34,11 +32,10 @@ const SignupPage = () => {
 
     try {
       const userData = await signupApi(formData)
-      console.log('Signup successful:', userData) // Add logging
-      authLogin(userData)
-      navigate('/verify-email')
+      console.log('Signup successful:', userData)
+      navigate('/verify-email', { state: { fromSignup: true } })
     } catch (err) {
-      console.error('Signup error:', err) // Add logging
+      console.error('Signup error:', err)
       setError(err instanceof Error ? err.message : 'Failed to create account')
     } finally {
       setIsLoading(false)

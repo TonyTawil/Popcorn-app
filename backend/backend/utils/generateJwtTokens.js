@@ -3,10 +3,18 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const generateJwtToken = (userId, res) => {
-  console.log('Generating JWT for userId:', userId);
+const generateJwtToken = (userId, isVerified, res) => {
+  console.log('Generating JWT for userId:', userId, 'verified:', isVerified);
   
-  const token = jwt.sign({ userId }, process.env.JWT_SECRET, {
+  if (!isVerified) {
+    console.log('Refusing to generate token for unverified user');
+    return null;
+  }
+
+  const token = jwt.sign({ 
+    userId,
+    isVerified 
+  }, process.env.JWT_SECRET, {
     expiresIn: "30d",
   });
 
