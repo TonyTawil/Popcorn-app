@@ -19,13 +19,24 @@ const userSchema = new mongoose.Schema(
     gender: { type: String, required: true, enum: ["male", "female", "other"] },
     profilePicture: { type: String, default: "" },
     isEmailVerified: { type: Boolean, default: false },
-    emailVerificationToken: { type: String, required: false },
+    emailVerificationToken: { 
+      type: String,
+      index: true
+    },
+    emailVerificationTokenExpiry: { 
+      type: Date
+    },
     isGoogleAccount: { type: Boolean, default: false },
     watchList: [movieListSchema],
     watched: [movieListSchema],
   },
   { timestamps: true }
 );
+
+userSchema.index({ 
+  emailVerificationToken: 1, 
+  emailVerificationTokenExpiry: 1 
+});
 
 const User = mongoose.model("User", userSchema);
 

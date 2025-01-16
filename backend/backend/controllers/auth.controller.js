@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import generateJwtToken from "../utils/generateJwtTokens.js";
 import generateEmailToken from "../utils/generateEmailTokens.js";
 import sendVerificationEmail from "../utils/sendVerificationEmail.js";
+import jwt from "jsonwebtoken";
 
 export const signup = async (req, res) => {
   try {
@@ -50,6 +51,9 @@ export const signup = async (req, res) => {
       await bcrypt.genSalt(10)
     );
 
+    const verificationToken = generateEmailToken();
+    console.log("Generated verification token for signup:", verificationToken);
+
     const newUser = new User({
       firstName,
       lastName,
@@ -57,102 +61,214 @@ export const signup = async (req, res) => {
       email,
       password: hashedPassword,
       gender,
-      profilePic:
-        gender == "male"
-          ? `https://avatar.iran.liara.run/public/boy?username=${username}`
-          : `https://avatar.iran.liara.run/public/girl?username=${username}`,
+      profilePic: gender === "male"
+        ? `https://avatar.iran.liara.run/public/boy?username=${username}`
+        : `https://avatar.iran.liara.run/public/girl?username=${username}`,
       isGoogleAccount,
-      isEmailVerified: isGoogleAccount ? true : false,
-      emailVerificationToken: isGoogleAccount ? null : generateEmailToken(),
+      isEmailVerified: false,
+      emailVerificationToken: verificationToken,
+      emailVerificationTokenExpiry: new Date(Date.now() + 24 * 60 * 60 * 1000)
     });
 
-    await newUser.save();
-    generateJwtToken(newUser._id, res);
-
-    res.status(201).json({
-      _id: newUser._id,
-      firstName: newUser.firstName,
-      lastName: newUser.lastName,
-      username: newUser.username,
-      profilePic: newUser.profilePic,
-      isEmailVerified: newUser.isEmailVerified,
+    const savedUser = await newUser.save();
+    console.log("Saved user verification details:", {
+      id: savedUser._id,
+      email: savedUser.email,
+      token: savedUser.emailVerificationToken,
+      expiry: savedUser.emailVerificationTokenExpiry
     });
 
     if (!isGoogleAccount) {
-      const verificationUrl =
-        process.env.NODE_ENV === "production"
-          ? `https://popcorn-4gmf.onrender.com/api/auth/verify-email?token=${newUser.emailVerificationToken}`
-          : `http://localhost:5000/api/auth/verify-email?token=${newUser.emailVerificationToken}`;
-
-      sendVerificationEmail(newUser.email, verificationUrl);
+      const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
+      await sendVerificationEmail(newUser.email, verificationUrl);
     }
+
+    const token = jwt.sign({ userId: savedUser._id }, process.env.JWT_SECRET, {
+      expiresIn: "30d",
+    });
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+      path: '/'
+    });
+
+    res.status(201).json({
+      _id: savedUser._id,
+      firstName: savedUser.firstName,
+      lastName: savedUser.lastName,
+      username: savedUser.username,
+      email: savedUser.email,
+      profilePic: savedUser.profilePic,
+      verified: savedUser.isEmailVerified
+    });
   } catch (error) {
-    console.error(error);
-    res
-      .status(500)
-      .json({ error: "An error occurred during the signup process" });
+    console.error('Signup error:', error);
+    res.status(500).json({ 
+      error: "An error occurred during the signup process",
+      details: error.message 
+    });
   }
 };
 
 export const login = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
 
-    const user = await User.findOne({ username });
-
-    if (user && (await bcrypt.compare(password, user.password || ""))) {
-      generateJwtToken(user._id, res);
-
-      res.status(200).json({
-        _id: user._id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        username: user.username,
-        profilePic: user.profilePic,
-      });
-    } else {
-      res.status(400).json({ error: "Invalid username or password" });
+    if (!user || !(await user.matchPassword(password))) {
+      return res.status(401).json({ error: "Invalid email or password" });
     }
+
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    // Set cookie with explicit settings
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: false, // Set to true in production
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    console.log('Setting cookie in login:', {
+      token: token.substring(0, 20) + '...',
+      cookies: res.getHeader('set-cookie')
+    });
+
+    res.json({
+      _id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      username: user.username,
+      email: user.email,
+      profilePic: user.profilePic || '',
+      verified: user.isEmailVerified
+    });
   } catch (error) {
-    console.error(error);
+    console.error('Login error:', error);
+    res.status(500).json({ error: error.message });
   }
 };
 
-export const logout = (req, res) => {
-  try {
-    res.cookie("jwt", "", {
-      maxAge: 0,
-    });
-
-    res.status(200).json({ message: "Logged out successfully" });
-  } catch (error) {
-    console.error(error);
-  }
+export const logout = async (req, res) => {
+  res.cookie("token", "", {
+    httpOnly: true,
+    expires: new Date(0),
+  });
+  res.status(200).json({ message: "Logged out successfully" });
 };
 
 export const verifyEmail = async (req, res) => {
   try {
     const { token } = req.query;
-    const user = await User.findOne({ emailVerificationToken: token });
+    console.log("Attempting to verify email with token:", token);
 
-    if (!user) {
-      return res
-        .status(400)
-        .json({ error: "Invalid or expired verification token" });
+    if (!token) {
+      return res.status(400).json({ error: "Verification token is required" });
     }
 
+    // First check if any user was previously verified with this token
+    const verifiedUser = await User.findOne({ 
+      $or: [
+        { emailVerificationToken: token },
+        { _id: { $in: await User.find({ isEmailVerified: true }).distinct('_id') } }
+      ]
+    });
+
+    if (verifiedUser && verifiedUser.isEmailVerified) {
+      // User is already verified, send success response with user data
+      return res.status(200).json({
+        message: "Email already verified",
+        user: {
+          _id: verifiedUser._id,
+          firstName: verifiedUser.firstName,
+          lastName: verifiedUser.lastName,
+          username: verifiedUser.username,
+          email: verifiedUser.email,
+          profilePic: verifiedUser.profilePic || verifiedUser.profilePicture || '',
+          verified: true
+        }
+      });
+    }
+
+    // Find user with valid token
+    const user = await User.findOne({ 
+      emailVerificationToken: token,
+      emailVerificationTokenExpiry: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ 
+        error: "Invalid or expired verification token" 
+      });
+    }
+
+    // Update user verification status
     user.isEmailVerified = true;
-    user.emailVerificationToken = null;
+    user.emailVerificationToken = undefined;
+    user.emailVerificationTokenExpiry = undefined;
     await user.save();
 
-    res.status(200).json({ message: "Email verified successfully" });
+    // Generate new JWT with updated verification status
+    generateJwtToken(user._id, res);
+
+    res.status(200).json({
+      message: "Email verified successfully",
+      user: {
+        _id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        username: user.username,
+        email: user.email,
+        profilePic: user.profilePic || user.profilePicture || '',
+        verified: true
+      }
+    });
   } catch (error) {
-    console.error(error);
-    res
-      .status(500)
-      .json({ error: "An error occurred during email verification" });
+    console.error('Verification error:', error);
+    res.status(500).json({ 
+      error: "An error occurred during email verification",
+      details: error.message 
+    });
   }
 };
+
+export const resendVerification = async (req, res) => {
+  try {
+    const { email } = req.body
+    const user = await User.findOne({ email })
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" })
+    }
+
+    if (user.isEmailVerified) {
+      return res.status(400).json({ error: "Email is already verified" })
+    }
+
+    const verificationToken = generateEmailToken()
+    user.emailVerificationToken = verificationToken
+    user.emailVerificationTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000)
+    await user.save()
+
+    const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}`
+    await sendVerificationEmail(user.email, verificationUrl)
+
+    res.status(200).json({ 
+      message: "Verification email resent successfully" 
+    })
+  } catch (error) {
+    console.error('Resend verification error:', error)
+    res.status(500).json({ 
+      error: "Failed to resend verification email" 
+    })
+  }
+}
 
 export const isEmailVerified = async (req, res) => {
   try {
@@ -190,5 +306,25 @@ export const getUserByEmail = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Server error" });
+  }
+};
+
+export const checkAuth = async (req, res) => {
+  try {
+    // User is already attached by protect middleware
+    const user = req.user;
+    
+    res.json({
+      _id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      username: user.username,
+      email: user.email,
+      profilePic: user.profilePic || '',
+      verified: user.isEmailVerified
+    });
+  } catch (error) {
+    console.error('Auth check error:', error);
+    res.status(401).json({ error: 'Not authenticated' });
   }
 };
