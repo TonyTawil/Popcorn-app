@@ -1,20 +1,24 @@
 import express from "express";
+import { protect } from "../middleware/authMiddleware.js";
 import {
   addToWatchlist,
   removeFromWatchlist,
+  getWatchlist,
   addToWatched,
   removeFromWatched,
-  getWatchlist,
   getWatched,
 } from "../controllers/movie.controller.js";
 
 const router = express.Router();
 
-router.post("/add-to-watchlist", addToWatchlist);
-router.post("/remove-from-watchlist", removeFromWatchlist);
-router.post("/add-to-watched", addToWatched);
-router.post("/remove-from-watched", removeFromWatched);
-router.post("/get-watchlist", getWatchlist);
-router.post("/get-watched", getWatched);
+// Apply protect middleware to all routes
+router.use(protect);
+
+router.post("/watchlist/add", addToWatchlist);
+router.post("/watchlist/remove", removeFromWatchlist);
+router.post("/watchlist", getWatchlist);
+router.post("/watched/add", addToWatched);
+router.post("/watched/remove", removeFromWatched);
+router.post("/watched", getWatched);
 
 export default router;

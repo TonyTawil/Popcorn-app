@@ -8,6 +8,7 @@ import AllMoviesPage from './pages/AllMoviesPage'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
 import VerificationPage from './pages/VerificationPage'
+import WatchlistPage from './pages/WatchlistPage'
 
 // Separate route configurations for better maintainability
 const routes = [
@@ -40,6 +41,12 @@ const routes = [
     path: '/movies/:category',
     element: <AllMoviesPage />,
     public: true
+  },
+  {
+    path: '/watchlist',
+    element: <ProtectedRoute>
+      <WatchlistPage />
+    </ProtectedRoute>
   }
 ]
 
