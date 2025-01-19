@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import AuthInput from '../components/auth/AuthInput'
 import { login as loginApi } from '../services/api'
 import { useAuth } from '../context/AuthContext'
@@ -7,7 +7,6 @@ import PasswordInput from '../components/auth/PasswordInput'
 
 const LoginPage = () => {
   const navigate = useNavigate()
-  const location = useLocation()
   const { login } = useAuth()
   const [formData, setFormData] = useState({
     username: '',
@@ -16,7 +15,6 @@ const LoginPage = () => {
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
-  const from = (location.state as any)?.from?.pathname || '/'
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
