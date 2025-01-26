@@ -1,18 +1,14 @@
 import { NextResponse } from 'next/server';
 import { getTrending, getMoviesByType } from '@/lib/tmdb';
 
-export async function GET(req: Request) {
+export async function GET(
+  req: Request,
+  { params }: { params: { type: string } }
+) {
   try {
+    const type = params.type;
     const { searchParams } = new URL(req.url);
-    const type = searchParams.get('type');
     const page = Number(searchParams.get('page')) || 1;
-
-    if (!type) {
-      return NextResponse.json(
-        { error: 'Movie type is required' },
-        { status: 400 }
-      );
-    }
 
     let data;
     if (type === 'trending') {

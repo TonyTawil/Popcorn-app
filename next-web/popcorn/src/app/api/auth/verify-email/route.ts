@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
+import { signIn } from 'next-auth/react';
 import User from '@/models/User';
 import connectDB from '@/db/mongodb';
 
-export async function GET(req: Request) {
+export async function POST(req: Request) {
   try {
-    const { searchParams } = new URL(req.url);
-    const token = searchParams.get('token');
+    const { token } = await req.json();
 
     if (!token) {
       return NextResponse.json(
@@ -23,23 +23,6 @@ export async function GET(req: Request) {
     });
 
     if (!user) {
-      // Check if token was already used
-      const verifiedUser = await User.findOne({
-        emailVerificationToken: token
-      });
-
-      if (verifiedUser && verifiedUser.isEmailVerified) {
-        return NextResponse.json({
-          message: 'Email already verified',
-          user: {
-            id: verifiedUser._id,
-            email: verifiedUser.email,
-            name: `${verifiedUser.firstName} ${verifiedUser.lastName}`,
-            verified: true
-          }
-        });
-      }
-
       return NextResponse.json(
         { error: 'Invalid or expired verification token' },
         { status: 400 }
@@ -48,24 +31,21 @@ export async function GET(req: Request) {
 
     // Update user verification status
     user.isEmailVerified = true;
+    user.emailVerificationToken = undefined;
+    user.emailVerificationTokenExpiry = undefined;
     await user.save();
 
     return NextResponse.json({
       message: 'Email verified successfully',
+      verified: true,
       user: {
-        id: user._id,
-        email: user.email,
-        name: `${user.firstName} ${user.lastName}`,
-        verified: true
+        email: user.email
       }
     });
   } catch (error) {
     console.error('Verification error:', error);
     return NextResponse.json(
-      { 
-        error: 'An error occurred during email verification',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
+      { error: 'Failed to verify email' },
       { status: 500 }
     );
   }

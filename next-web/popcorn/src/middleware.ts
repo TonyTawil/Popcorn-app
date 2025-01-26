@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { getToken } from 'next-auth/jwt';
 
-export function middleware(request: NextRequest) {
-  const token = request.cookies.get('token')?.value;
-  
-  // Protect API routes that require authentication
-  if (request.nextUrl.pathname.startsWith('/api/watchlist') || 
-      request.nextUrl.pathname.startsWith('/api/reviews')) {
+export async function middleware(request: NextRequest) {
+  // Check for protected routes
+  if (request.nextUrl.pathname.startsWith('/api/watchlist')) {
+    const token = await getToken({ req: request });
+
     if (!token) {
       return NextResponse.json(
         { error: 'Authentication required' },
@@ -15,9 +15,22 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  return NextResponse.next();
+  const response = NextResponse.next();
+
+  // Add CORS headers
+  response.headers.set('Access-Control-Allow-Origin', '*');
+  response.headers.set(
+    'Access-Control-Allow-Methods',
+    'GET, POST, PUT, DELETE, OPTIONS'
+  );
+  response.headers.set(
+    'Access-Control-Allow-Headers',
+    'Content-Type, Authorization'
+  );
+
+  return response;
 }
 
 export const config = {
-  matcher: '/api/:path*',
+  matcher: ['/api/watchlist/:path*', '/api/:path*'],
 }; 

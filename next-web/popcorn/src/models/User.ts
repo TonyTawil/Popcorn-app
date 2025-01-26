@@ -1,6 +1,6 @@
 import mongoose, { Document } from 'mongoose';
 
-interface IMovieList {
+export interface IMovieList {
   movieId: number;
   title: string;
   coverImage: string;
@@ -54,7 +54,7 @@ const userSchema = new mongoose.Schema<IUser>(
     },
     isGoogleAccount: { type: Boolean, default: false },
     watchList: [movieListSchema],
-    watched: [movieListSchema],
+    watched: [movieListSchema]
   },
   { timestamps: true }
 );

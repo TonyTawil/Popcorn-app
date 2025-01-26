@@ -10,6 +10,14 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RetrofitClient {
 
     private static Retrofit retrofit = null;
+    
+    // Use this for production
+    private static final String PRODUCTION_URL = "https://antoinetawil.com/";
+    // Use this for local development
+    private static final String LOCAL_URL = "http://10.0.2.2:3000/";
+    
+    // Change this flag to switch between production and local development
+    private static final boolean USE_PRODUCTION = true;
 
     public static Retrofit getRetrofitInstance(Context context) {
         if (retrofit == null) {
@@ -17,11 +25,22 @@ public class RetrofitClient {
             int cacheSize = 10 * 1024 * 1024;
             Cache cache = new Cache(httpCacheDirectory, cacheSize);
 
-            OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-            httpClient.cache(cache);
+            OkHttpClient.Builder httpClient = new OkHttpClient.Builder()
+                .cache(cache)
+                .addInterceptor(chain -> {
+                    okhttp3.Request original = chain.request();
+                    
+                    // Add headers if needed
+                    okhttp3.Request request = original.newBuilder()
+                        .header("Accept", "application/json")
+                        .method(original.method(), original.body())
+                        .build();
+                    
+                    return chain.proceed(request);
+                });
 
             retrofit = new Retrofit.Builder()
-                    .baseUrl("https://popcorn-4gmf.onrender.com/")
+                    .baseUrl(USE_PRODUCTION ? PRODUCTION_URL : LOCAL_URL)
                     .addConverterFactory(GsonConverterFactory.create())
                     .client(httpClient.build())
                     .build();

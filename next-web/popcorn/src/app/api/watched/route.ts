@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth.config';
 import User from '@/models/User';
 import connectDB from '@/db/mongodb';
-import type { WatchlistMovie } from '@/types/user';
+import type { IMovieList } from '@/models/User';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,11 +27,11 @@ export async function GET() {
       );
     }
 
-    return NextResponse.json({ watchList: user.watchList });
+    return NextResponse.json({ watched: user.watched });
   } catch (error) {
-    console.error('Get watchlist error:', error);
+    console.error('Get watched list error:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch watchlist' },
+      { error: 'Failed to fetch watched list' },
       { status: 500 }
     );
   }
@@ -61,36 +61,40 @@ export async function POST(req: Request) {
 
     switch (type) {
       case 'add': {
-        const isMovieInWatchlist = user.watchList.some(
-          (movie: WatchlistMovie) => movie.movieId === movieId
+        const isMovieInWatched = user.watched.some(
+          (movie: IMovieList) => movie.movieId === movieId
         );
 
-        if (isMovieInWatchlist) {
+        if (isMovieInWatched) {
           return NextResponse.json(
-            { error: 'Movie already in watchlist' },
+            { error: 'Movie already in watched list' },
             { status: 409 }
           );
         }
 
-        const newMovie: WatchlistMovie = { movieId, title, coverImage };
-        user.watchList.push(newMovie);
+        // Add to watched and remove from watchlist if present
+        user.watched.push({ movieId, title, coverImage });
+        user.watchList = user.watchList.filter(
+          (movie: IMovieList) => movie.movieId !== movieId
+        );
         await user.save();
 
         return NextResponse.json({
-          message: 'Movie added to watchlist',
+          message: 'Movie added to watched list',
+          watched: user.watched,
           watchList: user.watchList,
         });
       }
 
       case 'remove': {
-        user.watchList = user.watchList.filter(
-          (movie: WatchlistMovie) => movie.movieId !== movieId
+        user.watched = user.watched.filter(
+          (movie: IMovieList) => movie.movieId !== movieId
         );
         await user.save();
 
         return NextResponse.json({
-          message: 'Movie removed from watchlist',
-          watchList: user.watchList,
+          message: 'Movie removed from watched list',
+          watched: user.watched,
         });
       }
 
@@ -101,9 +105,9 @@ export async function POST(req: Request) {
         );
     }
   } catch (error) {
-    console.error('Watchlist operation error:', error);
+    console.error('Watched list operation error:', error);
     return NextResponse.json(
-      { error: 'Failed to update watchlist' },
+      { error: 'Failed to update watched list' },
       { status: 500 }
     );
   }
